@@ -86,6 +86,16 @@ Optional wrapper:
 - `hiq-auto` 是自动编排 wrapper，不是第 12 个 retained owner。
 - 它会创建或刷新 goal 记录，持续在 retained 11 中选择当前真实 owner，并一直推进到 `hiq-review` 证明验收通过，或诚实记录真实阻塞。
 
+## One-Line Prompt | 一句话安装词
+
+Send this sentence directly to Codex / Claude / LiveAgent:
+
+```text
+请把当前仓库安装并配置为 HiQ：先完成宿主级 HiQ 安装与 skill 同步，再完成项目级 HiQ 初始化，启用 hiq-auto 自动模式，并验证 hiq-status / hiq-doctor 通过；如果缺少任何必要配置或脚本，请直接补齐，直到可以开始用 HiQ 正常开发为止。
+```
+
+把上面这句话直接发给 Codex / Claude / LiveAgent，就可以让 AI 直接开始 HiQ 的安装、配置和初始化流程。
+
 ## Automatic Mode | 自动模式
 
 ```text
