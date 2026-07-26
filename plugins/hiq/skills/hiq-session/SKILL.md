@@ -110,6 +110,12 @@ STATE classify_mode:
 
 STATE rebuild_pointer:
   reconstruct or refresh these fields in `.hiq/session.md`:
+    entry_skill
+    entry_mode
+    auto_status
+    auto_owner
+    auto_reason
+    manual_override
     active_change
     phase
     next_skill
@@ -126,6 +132,12 @@ STATE rebuild_pointer:
     last_action
     next_action
   mirror the operational subset into `.hiq/current-change.json`:
+    entrySkill
+    entryMode
+    autoStatus
+    autoOwnerSkill
+    autoReason
+    manualOverride
     activeChange
     phase
     ownerSkill
@@ -146,6 +158,8 @@ STATE session_packet:
 STATE status_emit:
   when mode=status:
     emit a short snapshot from local state:
+      entry skill / entry mode
+      auto status / current auto owner / manual override if any
       active change and phase
       current goal
       blockers
@@ -212,6 +226,12 @@ STATE route:
 `.hiq/session.md` must preserve these fields in recoverable form:
 
 - started / updated / agent
+- entry_skill
+- entry_mode
+- auto_status
+- auto_owner
+- auto_reason
+- manual_override
 - active_change
 - phase
 - next_skill
@@ -230,6 +250,12 @@ STATE route:
 
 `.hiq/current-change.json` must preserve these fields in machine-readable form:
 
+- entrySkill
+- entryMode
+- autoStatus
+- autoOwnerSkill
+- autoReason
+- manualOverride
 - activeChange
 - phase
 - ownerSkill

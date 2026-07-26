@@ -197,6 +197,12 @@ install:
 write_if_absent "$HIQ/current-change.json" "{
   \"framework\": \"hiq\",
   \"schema\": 1,
+  \"entrySkill\": \"hiq-auto\",
+  \"entryMode\": \"auto\",
+  \"autoStatus\": \"active\",
+  \"autoOwnerSkill\": \"hiq-session\",
+  \"autoReason\": \"project auto rule enabled; rebuild pointer or start the first truthful owner skill\",
+  \"manualOverride\": \"none\",
   \"activeChange\": null,
   \"phase\": \"idle\",
   \"ownerSkill\": \"hiq-session\",
@@ -220,6 +226,12 @@ write_if_absent "$HIQ/session.md" "# Session
 - **started**: $STAMP
 - **updated**: $STAMP
 - **agent**:
+- **entry_skill**: \`hiq-auto\`
+- **entry_mode**: auto
+- **auto_status**: active
+- **auto_owner**: \`hiq-session\`
+- **auto_reason**: project auto rule enabled; rebuild pointer or start the first truthful owner skill
+- **manual_override**: none
 - **active_change**: none
 - **phase**: idle
 - **next_skill**: hiq-session

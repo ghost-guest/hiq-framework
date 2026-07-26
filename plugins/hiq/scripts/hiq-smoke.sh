@@ -25,14 +25,20 @@ echo "hiq-smoke: init-project root=$SMOKE_ROOT"
 bash "$SCRIPT_DIR/init-project.sh" "$SMOKE_ROOT" >/dev/null
 
 grep -q 'entry_skill: hiq-auto' "$SMOKE_ROOT/.hiq/config.yaml" || fail 'missing hiq-auto entry skill'
+grep -q '"entrySkill": "hiq-auto"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing entrySkill in current-change.json'
+grep -q '"autoOwnerSkill": "hiq-session"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing autoOwnerSkill in current-change.json'
 grep -q '"goalId"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing goalId in current-change.json'
 grep -q '"goalPath"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing goalPath in current-change.json'
+grep -q -- '- \*\*entry_skill\*\*: `hiq-auto`' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing entry_skill in session.md'
+grep -q -- '- \*\*auto_owner\*\*: `hiq-session`' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing auto_owner in session.md'
 grep -q -- '- \*\*goal_record\*\*:' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing goal_record in session.md'
 
 status_out="$(bash "$SCRIPT_DIR/hiq-status.sh" "$SMOKE_ROOT")"
 doctor_pre="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
 
 echo "$status_out" | grep -q 'session=ok' || fail 'status did not report session=ok after init-project'
+echo "$status_out" | grep -q 'entry_skill=hiq-auto' || fail 'status should report entry_skill=hiq-auto after init-project'
+echo "$status_out" | grep -q 'auto_owner=hiq-session' || fail 'status should report auto_owner=hiq-session after init-project'
 echo "$doctor_pre" | grep -q 'runtime.codegraph_index=missing' || fail 'doctor should report missing codegraph index before project-init'
 echo "$doctor_pre" | grep -q 'overall=partial' || fail 'doctor should report overall=partial before project-init'
 

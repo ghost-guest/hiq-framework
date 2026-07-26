@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.21 — 2026-07-26
+
+- makes `hiq-auto` project entry and owner selection auditable from local state instead of chat inference
+  - adds `entrySkill` / `entryMode` / `autoStatus` / `autoOwnerSkill` / `autoReason` / `manualOverride` markers to the project state templates
+  - teaches `init-project` on POSIX and Windows to seed those markers in fresh `.hiq/session.md` and `.hiq/current-change.json`
+  - expands `hiq-status` on POSIX and Windows so operators can directly inspect whether a session entered through `hiq-auto` and which owner it selected
+  - updates `hiq-auto` and `hiq-session` contracts so future sessions must preserve the same audit trail
+  - upgrades smoke checks to prove the markers are present and readable after initialization
+
 ## 0.8.20 — 2026-07-26
 
 - tightens HiQ runtime truth so framework health is proven instead of inferred

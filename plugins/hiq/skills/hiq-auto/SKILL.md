@@ -57,6 +57,11 @@ STATE activate:
   ensure project auto rule exists in:
     AGENTS.md
     `.hiq/config.yaml` auto section
+  write or refresh the auto-entry audit markers in `.hiq/session.md` and `.hiq/current-change.json`:
+    entry skill = `hiq-auto`
+    entry mode = auto | goal | continue | override | handoff
+    auto status = active unless explicitly disabled/blocked/accepted
+    manual override = none unless the user explicitly forced one owner lane
   decide mode:
     explicit auto / new request -> auto or goal
     existing goal record with open status -> continue
@@ -110,6 +115,10 @@ STATE choose_owner:
     otherwise -> hiq
   append owner transition row into the goal ledger
   write owner + reason into goal record and session pointer
+  mirror the same audit markers into `.hiq/current-change.json`:
+    autoOwnerSkill
+    autoReason
+    manualOverride
 
 STATE drive_step:
   activate the chosen owner skill for exactly the current honest step
@@ -155,8 +164,8 @@ STATE handoff:
 | Project rule | `AGENTS.md` | auto-load `hiq-auto` for new conversations when host honors AGENTS |
 | Runtime config | `.hiq/config.yaml` | auto-mode flags and goal policy |
 | Goal record | `.hiq/goals/<id>.md` | outer orchestration state, owner transition ledger, and completion bar |
-| Session packet | `.hiq/session.md` | current truthful pointer for resumes |
-| Change pointer | `.hiq/current-change.json` | machine-readable next owner and goal state |
+| Session packet | `.hiq/session.md` | current truthful pointer for resumes, including whether `hiq-auto` entered and which owner it selected |
+| Change pointer | `.hiq/current-change.json` | machine-readable next owner, goal state, and `hiq-auto` audit markers |
 | Owner artifacts | `.hiq/changes/<id>/...` | grill / implement / debug / review / evolve / skill artifacts |
 | Checkpoints | `context-checkpoints/<file>.md` | compact-safe handoff for long sessions |
 

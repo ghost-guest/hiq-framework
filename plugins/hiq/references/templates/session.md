@@ -7,6 +7,12 @@
 - **started**:
 - **updated**:
 - **agent**:
+- **entry_skill**: `hiq-auto` | `hiq` | manual
+- **entry_mode**: auto | manual | override | continue | handoff
+- **auto_status**: active | manual | disabled | blocked | accepted | handoff
+- **auto_owner**: `hiq-...` or none
+- **auto_reason**:
+- **manual_override**: none | `hiq-...`
 - **active_change**: `.hiq/changes/<id>/` or none
 - **phase**: idle | grill | implement | debug | review | evolve | knowledge | skill
 - **next_skill**:

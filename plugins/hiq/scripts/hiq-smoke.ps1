@@ -29,15 +29,21 @@ try {
   if ($configText -notmatch 'entry_skill: hiq-auto') { Fail 'missing hiq-auto entry skill' }
 
   $current = Get-Content -LiteralPath (Join-Path $SmokeRoot '.hiq\current-change.json') -Raw | ConvertFrom-Json
+  if ([string]$current.entrySkill -ne 'hiq-auto') { Fail 'missing entrySkill in current-change.json' }
+  if ([string]$current.autoOwnerSkill -ne 'hiq-session') { Fail 'missing autoOwnerSkill in current-change.json' }
   if (-not ($current.PSObject.Properties.Name -contains 'goalId')) { Fail 'missing goalId in current-change.json' }
   if (-not ($current.PSObject.Properties.Name -contains 'goalPath')) { Fail 'missing goalPath in current-change.json' }
 
   $sessionText = Get-Content -LiteralPath (Join-Path $SmokeRoot '.hiq\session.md') -Raw
+  if ($sessionText -notmatch '- \*\*entry_skill\*\*: `hiq-auto`') { Fail 'missing entry_skill in session.md' }
+  if ($sessionText -notmatch '- \*\*auto_owner\*\*: `hiq-session`') { Fail 'missing auto_owner in session.md' }
   if ($sessionText -notmatch '- \*\*goal_record\*\*:') { Fail 'missing goal_record in session.md' }
 
   $statusOut = & (Join-Path $scriptDir 'hiq-status.ps1') $SmokeRoot | Out-String
   $doctorPre = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
   if ($statusOut -notmatch 'session=ok') { Fail 'status did not report session=ok after init-project' }
+  if ($statusOut -notmatch 'entry_skill=hiq-auto') { Fail 'status should report entry_skill=hiq-auto after init-project' }
+  if ($statusOut -notmatch 'auto_owner=hiq-session') { Fail 'status should report auto_owner=hiq-session after init-project' }
   if ($doctorPre -notmatch 'runtime.codegraph_index=missing') { Fail 'doctor should report missing codegraph index before project-init' }
   if ($doctorPre -notmatch 'overall=partial') { Fail 'doctor should report overall=partial before project-init' }
 

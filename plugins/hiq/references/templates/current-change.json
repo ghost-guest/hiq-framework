@@ -1,6 +1,12 @@
 {
   "framework": "hiq",
   "schema": 1,
+  "entrySkill": "hiq-auto",
+  "entryMode": "auto",
+  "autoStatus": "active",
+  "autoOwnerSkill": "hiq-session",
+  "autoReason": "project auto rule enabled; rebuild pointer or start the first truthful owner skill",
+  "manualOverride": "none",
   "activeChange": ".hiq/changes/<id>/",
   "phase": "idle",
   "ownerSkill": "hiq-session",
