@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.17 — 2026-07-26
+
+- adds `hiq-auto` as an **optional auto-goal orchestration wrapper**
+  - keeps the retained owner surface at 11 while adding a project-level automatic entrypoint
+  - adds `AGENTS.md`, auto-mode config, and `.hiq/goals/` goal-record workflow so new conversations can enter the goal loop by default
+  - teaches templates/docs/routing that `hiq-auto` keeps choosing truthful owner steps until `hiq-review` proves acceptance or a real blocker is recorded
+  - syncs README / FRAMEWORK / catalog / routing / bootstrap/config/init surfaces with the wrapper model
+
 ## 0.8.16 — 2026-07-26
 
 - HiQ now absorbs the useful Comet runtime surface without introducing a second framework

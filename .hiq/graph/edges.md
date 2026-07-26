@@ -2,6 +2,7 @@
 
 | From | To | Kind | Why |
 |------|----|------|-----|
+| `hiq-auto` | retained 11 | orchestrates | 外层 goal wrapper；每一步选择当前真实 owner |
 | `hiq` | `hiq-init` | route | 仓库还没有可靠基线 |
 | `hiq` | `hiq-install` | route | 当前问题本质上是宿主安装或 runtime 健康 |
 | `hiq` | `hiq-session` | route | 需要先重建会话状态或写 checkpoint |

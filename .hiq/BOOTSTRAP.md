@@ -4,7 +4,7 @@
 
 ## One-liner
 
-**HiQ**：唯一 AI 开发 Skill OS。本仓库是 HiQ 框架本体（11-skill edition）；当前已吸收 Comet 中真正有价值的轻 runtime 状态 / status / doctor / eval / skill harness 能力，但不引入第二套框架表面。
+**HiQ**：唯一 AI 开发 Skill OS。本仓库是 HiQ 框架本体：11 个 retained owner skill + 可选 `hiq-auto` 自动 wrapper；当前已吸收 Comet 中真正有价值的轻 runtime 状态 / status / doctor / eval / skill harness 能力，但不引入第二套框架表面。
 
 ## Verify
 
@@ -64,6 +64,7 @@ bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
 ## Resume
 
 ```text
-$hiq-session
+$hiq-auto
 # 或：继续 context-checkpoints/hiq-retained-wave-complete-20260726-1108.md
+# 需要手动单车道时，再显式点名 $hiq-session / $hiq-debug / ...
 ```

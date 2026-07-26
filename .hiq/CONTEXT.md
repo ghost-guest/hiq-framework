@@ -20,9 +20,11 @@ HiQ：替代 Trellis/do-it 的本地 AI 开发 Skill OS。技能在 `plugins/hiq
 
 | Term | Meaning |
 |------|---------|
+| hiq-auto | 自动 goal wrapper；持续选择当前真实 owner，直到验收或诚实阻塞 |
 | hiq-init | 产品仓初始化（记忆 + session 指针 + codegraph） |
 | hiq-install | 宿主 skills + codegraph-rs 安装 |
 | session.md | 可恢复 active_change / phase |
+| goals/ | hiq-auto 的 durable outer-loop goal 状态 |
 | graph/ | 人读模块地图；符号真源在 .codegraph/ |
 
 ## Explicit non-goals

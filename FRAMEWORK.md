@@ -2,7 +2,7 @@
 
 ## 1. 定位
 
-HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划、施工、调试、验收、演进、知识沉淀、skill 治理，以及吸收自 Comet 的轻 runtime 状态 / status / doctor / eval / skill harness，收敛成 11 个长期保留的厚 skill。
+HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划、施工、调试、验收、演进、知识沉淀、skill 治理，以及吸收自 Comet 的轻 runtime 状态 / status / doctor / eval / skill harness，收敛成 11 个长期保留的 owner skill；另外提供一个可选的 `hiq-auto` 自动编排 wrapper，用来持续调用真实 owner，但不把 stable owner surface 扩成 12 个。
 
 目标不是“命令更多”，而是：
 
@@ -46,6 +46,13 @@ HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划�
 | `hiq-knowledge` | ADR/lessons/casebook/audit |
 | `hiq-skill` | skill 治理 / 加厚 / 吸收 / 同步 |
 
+### 3.1 可选自动包装层：`hiq-auto`
+
+- `hiq-auto` 不是 retained owner #12
+- 它是外层自动入口，负责 goal 驱动、连续选择当前真实 owner、持续推进到验收或诚实阻塞
+- 默认 owner 仍然只来自 retained 11
+- `hiq-review` 仍然是唯一 completion / acceptance proof owner
+
 ## 4. 风险分级
 
 | 级别 | 信号 | 最小流程 |
@@ -58,23 +65,17 @@ HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划�
 ## 5. 生命周期总图
 
 ```text
-hiq-install (host + doctor)
-hiq-init (project baseline + runtime state + CodeGraph + eval scaffold)
-      │
-hiq-session
-      │
-hiq-grill      # grill.md + IMPLEMENT.md + decision/research/architecture contract
-      │
-hiq-implement  # feature execution + spec load + slice self-check
-      │
-hiq-review     # review.md + findings + evidence/eval gate + closeout
-      │
-hiq-session    # finish / handoff
-
-debug lane:   hiq-debug
-change lane:  hiq-evolve
-memory lane:  hiq-knowledge
-meta lane:    hiq-skill
+hiq-auto       # optional outer goal wrapper; keeps choosing the truthful owner step
+   │
+   ├─ hiq-install (host + doctor)
+   ├─ hiq-init (project baseline + runtime state + CodeGraph + eval scaffold)
+   ├─ hiq-session
+   ├─ hiq-grill      # grill.md + IMPLEMENT.md + decision/research/architecture contract
+   ├─ hiq-implement  # feature execution + spec load + slice self-check
+   ├─ hiq-debug      # root-cause lane
+   ├─ hiq-evolve     # evolution lane
+   ├─ hiq-knowledge  # durable memory lane
+   └─ hiq-review     # proof gate; required before accepted completion
 ```
 
 ## 6. 根路由算法（`hiq`）
@@ -111,6 +112,7 @@ ELSE ASK one focused decision question
 - `config.yaml`：runtime / review / install 默认配置
 - `current-change.json`：机器可读的当前 change 指针
 - `session.md`：当前会话与下一步
+- `goals/<id>.md`：`hiq-auto` 的外层 goal 编排状态
 - `grill.md`：事实/决策/专家板/计划状态
 - `IMPLEMENT.md`：批准后的施工契约
 - `debug.md`：症状/假设/根因/回归保护/自测循环
@@ -124,7 +126,8 @@ ELSE ASK one focused decision question
 HiQ 成功，不是因为 skill 名字多，而是因为：
 
 - 新会话能从本地状态续上
+- `hiq-auto` 能把 goal 持续推进到真实 owner，而不是停在半路
 - 施工与调试都能诚实路由到唯一主 skill
 - bug 修复有根因和回归保护
 - 交付放行有真实证据
-- 框架能力继续吸收到 11 个保留 skill 内，而不是重新膨胀
+- 框架能力继续吸收到 11 个保留 owner skill 内，而不是重新膨胀

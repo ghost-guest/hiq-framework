@@ -1,13 +1,14 @@
 # HiQ Skill Catalog
 
-This file explains what each retained HiQ skill does, when to use it, which modes matter, and what a normal invocation looks like.
+This file explains what each retained HiQ owner skill does, plus the optional `hiq-auto` wrapper, when to use them, which modes matter, and what a normal invocation looks like.
 
-本文件用于解释 HiQ 每个保留 skill 的职责、适用场景、常见模式，以及日常应如何调用。
+本文件用于解释 HiQ 每个保留 owner skill，以及可选的 `hiq-auto` 自动 wrapper 的职责、适用场景、常见模式，以及日常应如何调用。
 
 ## Quick Index | 快速索引
 
 | Skill | Short Role | 简述 |
 |---|---|---|
+| `hiq-auto` | auto goal wrapper | 自动目标编排入口 |
 | `hiq` | root routing | 根路由与主 skill 选择 |
 | `hiq-init` | project bootstrap | 项目初始化与基线建立 |
 | `hiq-install` | host/runtime install | 宿主安装与运行时同步 |
@@ -19,6 +20,43 @@ This file explains what each retained HiQ skill does, when to use it, which mode
 | `hiq-evolve` | system evolution | 重构、迁移、性能和加固 |
 | `hiq-knowledge` | durable knowledge | ADR、经验、案例与审计 |
 | `hiq-skill` | framework governance | skill 治理、自进化与发布 |
+
+## 0. `hiq-auto`
+
+**Capability | 能力**
+
+- Acts as the automatic outer wrapper for HiQ-managed project work.
+- Creates or refreshes a durable goal record under `.hiq/goals/`.
+- Repeatedly chooses the truthful current owner from the retained 11 and keeps going until acceptance is proven.
+
+- 作为 HiQ 项目工作的自动外层 wrapper。
+- 在 `.hiq/goals/` 下创建或刷新 durable goal 记录。
+- 持续从 retained 11 中选择当前真实 owner，并一直推进到验收被证明通过。
+
+**Use it when | 什么时候用**
+
+- The project enables auto mode by rule.
+- The user wants end-to-end delivery, autopilot behavior, or goal-driven continuation.
+- You want HiQ to keep orchestrating the next honest step instead of stopping after one lane.
+
+- 项目规则启用了 auto mode。
+- 用户想要端到端推进、autopilot 行为或 goal-driven 续作。
+- 你希望 HiQ 不停在单个车道里，而是持续编排下一步真实 owner。
+
+**Common modes | 常用模式**
+
+- `auto`
+- `goal`
+- `continue`
+- `override`
+- `handoff`
+
+**Examples | 示例**
+
+```text
+$hiq-auto Ship this feature and keep going until review-backed acceptance
+$hiq-auto 把这个需求一路推进到验收通过为止
+```
 
 ## 1. `hiq`
 
@@ -438,7 +476,9 @@ $hiq-skill Prepare the retained 11 for external publish
 
 ## Rule of Thumb | 一个简单判断法
 
-If the work is unclear, start with `hiq`.
+If the project is in auto mode, start with `hiq-auto`.
+
+If the work is unclear and you are not using the auto wrapper, start with `hiq`.
 
 If the work is clear but needs a contract, go to `hiq-grill`.
 

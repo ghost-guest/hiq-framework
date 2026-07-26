@@ -2,6 +2,7 @@
 
 | User signal | Route | Lane |
 |-------------|-------|------|
+| auto、autopilot、goal、端到端完成、一直推进到验收通过、keep going until accepted | `hiq-auto` | automation |
 | 开会话、开始工作、resume、finish、handoff、profile、checkpoint 恢复、status、resume probe | `hiq-session` | session |
 | 产品仓初始化 / 工程记忆 / CodeGraph / 吸收旧框架 / runtime state scaffold / eval scaffold | `hiq-init` | init |
 | 安装/升级 HiQ 到宿主；runtime sync；codegraph/runtime repair；宿主健康校验；doctor | `hiq-install` | host |
@@ -25,6 +26,7 @@
 
 ## Root rules
 
+- `hiq-auto` 可以做外层自动编排，但当前真实 owner 仍然只能是一个 retained skill
 - `hiq` 任一时刻只激活一个当前主 skill
 - 用户显式点名 skill 时，若与真实任务冲突，以真实 owner 为准
 - Ambiguous but locally resolvable -> 本地验证，不问用户

@@ -21,6 +21,7 @@
 
 ## Work Now
 
+- **goal_record**: `.hiq/goals/<id>.md` or none
 - **goal_now**:
 - **blockers**:
 - **acceptance_target**:

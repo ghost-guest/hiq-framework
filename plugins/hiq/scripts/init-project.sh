@@ -73,15 +73,16 @@ codegraph context \"<task>\"
 ## Runtime probes
 
 \`\`\`bash
-bash \"$HOME/.hiq/scripts/hiq-status.sh\" .
-bash \"$HOME/.hiq/scripts/hiq-doctor.sh\" .
+bash \"\$HOME/.hiq/scripts/hiq-status.sh\" .
+bash \"\$HOME/.hiq/scripts/hiq-doctor.sh\" .
 \`\`\`
 
 ## Resume
 
 \`\`\`text
-\$hiq-session
+\$hiq-auto
 # or: 继续 .hiq/BOOTSTRAP.md
+# manual lane override: \$hiq-session / \$hiq-debug / ...
 \`\`\`
 "
 
@@ -174,6 +175,14 @@ review:
   require_fresh_evidence: true
   eval_enabled: true
   eval_config: .hiq/eval/eval.yaml
+auto:
+  enabled: true
+  entry_skill: hiq-auto
+  goal_dir: .hiq/goals
+  project_rule_file: AGENTS.md
+  auto_resume: true
+  require_review_acceptance: true
+  allow_explicit_skill_override: true
 skill:
   retained_count: 11
   stable_surface: true
@@ -189,6 +198,8 @@ write_if_absent "$HIQ/current-change.json" "{
   \"ownerSkill\": \"hiq-session\",
   \"nextSkill\": \"hiq-session\",
   \"nextStep\": \"rebuild pointer or start the first truthful owner skill\",
+  \"goalId\": null,
+  \"goalPath\": null,
   \"goalNow\": \"\",
   \"acceptanceTarget\": \"\",
   \"latestCheckpoint\": null,
@@ -198,7 +209,7 @@ write_if_absent "$HIQ/current-change.json" "{
 
 write_if_absent "$HIQ/session.md" "# Session
 
-> Updated by \`$hiq-session\`. This file is the compact-safe local resume packet.
+> Updated by \`\$hiq-session\`. This file is the compact-safe local resume packet.
 
 ## Pointer
 
@@ -212,13 +223,14 @@ write_if_absent "$HIQ/session.md" "# Session
 
 ## Runtime State
 
-- **config**: `.hiq/config.yaml`
-- **current_change_record**: `.hiq/current-change.json`
-- **status_command**: `bash \"$HOME/.hiq/scripts/hiq-status.sh\" .`
-- **doctor_command**: `bash \"$HOME/.hiq/scripts/hiq-doctor.sh\" .`
+- **config**: \`.hiq/config.yaml\`
+- **current_change_record**: \`.hiq/current-change.json\`
+- **status_command**: \`bash \"\$HOME/.hiq/scripts/hiq-status.sh\" .\`
+- **doctor_command**: \`bash \"\$HOME/.hiq/scripts/hiq-doctor.sh\" .\`
 
 ## Work Now
 
+- **goal_record**: \`.hiq/goals/<id>.md\` or none
 - **goal_now**:
 - **blockers**:
 - **acceptance_target**:
@@ -316,10 +328,10 @@ write_if_absent "$HIQ/eval/README.md" "# Eval
 
 HiQ-native evaluation scaffold absorbed from the useful Comet ideas.
 
-- config: `.hiq/eval/eval.yaml`
-- reports: `.hiq/eval/runs/`
-- review owner: `hiq-review`
-- framework governance owner: `hiq-skill`
+- config: \`.hiq/eval/eval.yaml\`
+- reports: \`.hiq/eval/runs/\`
+- review owner: \`hiq-review\`
+- framework governance owner: \`hiq-skill\`
 "
 
 write_if_absent "$HIQ/eval/eval.yaml" "schema: 1
@@ -373,6 +385,23 @@ EOF
 else
   echo "exists=$HIQ/runtime-manifest.json"
 fi
+
+write_if_absent "$ROOT/AGENTS.md" "# HiQ Project Rule
+
+On every new conversation in this project, activate \`hiq-auto\` first unless the user explicitly disables auto mode for this turn.
+
+## Required behavior
+
+1. Treat \`hiq-auto\` as the outer automation wrapper.
+2. Keep the retained owner surface at 11.
+3. For normal work, enter goal mode:
+   - create or refresh \`.hiq/goals/<id>.md\`
+   - choose the truthful current owner skill
+   - continue until \`hiq-review\` proves acceptance or a real blocker is recorded
+4. Update \`.hiq/session.md\` and \`.hiq/current-change.json\` after meaningful owner changes.
+5. Ask the user only for genuine decisions that local truth cannot answer.
+6. If context pressure rises, checkpoint first, then resume through \`hiq-auto\`.
+"
 
 # profile gitignore hint at repo root
 if [[ -f "$ROOT/.gitignore" ]]; then

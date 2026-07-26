@@ -49,5 +49,6 @@ bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
 ## Resume
 
 ```text
-$hiq-session
+$hiq-auto
+# manual lane override when needed: $hiq-session / $hiq / $hiq-debug / ...
 ```

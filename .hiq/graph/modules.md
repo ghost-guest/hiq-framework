@@ -2,6 +2,7 @@
 
 | Module | Path | Responsibility | Key symbols |
 |--------|------|----------------|-------------|
+| auto-wrapper | `plugins/hiq/skills/hiq-auto` | goal 外层编排、自动选择当前 owner | `hiq-auto` |
 | root-router | `plugins/hiq/skills/hiq` | 定级、分流、选择唯一当前主 skill | `hiq` |
 | project-init | `plugins/hiq/skills/hiq-init` | `.hiq/` 基线、CodeGraph、eval scaffold | `hiq-init` |
 | host-install | `plugins/hiq/skills/hiq-install` | 宿主安装、runtime sync、doctor | `hiq-install` |

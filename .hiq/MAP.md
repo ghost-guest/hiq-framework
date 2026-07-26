@@ -2,7 +2,7 @@
 
 | Path | Role | Entry | Notes |
 |------|------|-------|-------|
-| `plugins/hiq/skills/` | 全部 skills | `hiq/SKILL.md` | 日常能力 |
+| `plugins/hiq/skills/` | 全部 skills | `hiq/SKILL.md`, `hiq-auto/SKILL.md` | retained owners + auto wrapper |
 | `plugins/hiq/skills/hiq-init/` | 产品仓初始化 | `SKILL.md` | 记忆+session+codegraph |
 | `plugins/hiq/skills/hiq-install/` | 宿主安装 | `SKILL.md` | skills+codegraph-rs |
 | `plugins/hiq/scripts/` | 脚本 | `init-project.sh`, `install-codegraph.sh`, `codegraph.sh` | Agent 调用 |

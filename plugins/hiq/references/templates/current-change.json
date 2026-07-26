@@ -6,6 +6,8 @@
   "ownerSkill": "hiq-session",
   "nextSkill": "hiq-session",
   "nextStep": "rebuild pointer or start the first truthful owner skill",
+  "goalId": null,
+  "goalPath": null,
   "goalNow": "",
   "acceptanceTarget": "",
   "latestCheckpoint": null,

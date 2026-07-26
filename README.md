@@ -1,8 +1,8 @@
 # HiQ
 
-HiQ is an AI engineering framework built around 11 retained skills, local project state, CodeGraph-first code understanding, and evidence-based delivery.
+HiQ is an AI engineering framework built around 11 retained owner skills, an optional `hiq-auto` automation wrapper, local project state, CodeGraph-first code understanding, and evidence-based delivery.
 
-HiQ 是一个围绕 11 个保留 skill、本地项目状态、CodeGraph-first 代码理解、以及证据驱动交付构建的 AI 开发框架。
+HiQ 是一个围绕 11 个保留 owner skill、一个可选的 `hiq-auto` 自动编排入口、本地项目状态、CodeGraph-first 代码理解、以及证据驱动交付构建的 AI 开发框架。
 
 ## What HiQ Is | HiQ 是什么
 
@@ -76,6 +76,28 @@ Detailed skill guidance lives in [SKILL_CATALOG.md](./SKILL_CATALOG.md).
 
 完整的 skill 能力、触发条件、模式和调用示例见 [SKILL_CATALOG.md](./SKILL_CATALOG.md)。
 
+Optional wrapper:
+
+- `hiq-auto` is an automation entrypoint, not retained owner #12.
+- It creates or refreshes a goal record, keeps selecting the truthful current owner from the retained 11, and does not stop until `hiq-review` proves acceptance or a real blocker is recorded.
+
+可选自动入口：
+
+- `hiq-auto` 是自动编排 wrapper，不是第 12 个 retained owner。
+- 它会创建或刷新 goal 记录，持续在 retained 11 中选择当前真实 owner，并一直推进到 `hiq-review` 证明验收通过，或诚实记录真实阻塞。
+
+## Automatic Mode | 自动模式
+
+```text
+$hiq-auto
+# auto goal loop -> choose current owner -> keep going until acceptance
+```
+
+```text
+$hiq-auto
+# 自动进入 goal 循环 -> 选择当前 owner -> 一直推进到验收达标
+```
+
 ## Typical Flow | 典型流程
 
 ```text
@@ -116,14 +138,14 @@ Special lanes:
 
 ```text
 $hiq-init
-$hiq-session
-$hiq
+$hiq-auto
+# manual lane when needed: $hiq / $hiq-debug / $hiq-evolve / ...
 ```
 
 Example:
 
 ```text
-$hiq Add an export button to the settings page
+$hiq-auto Add an export button to the settings page and keep going until acceptance
 $hiq-debug Intermittent duplicate payment callback processing
 $hiq-evolve Migrate Express to Fastify without breaking one major API version
 ```
@@ -131,7 +153,7 @@ $hiq-evolve Migrate Express to Fastify without breaking one major API version
 示例：
 
 ```text
-$hiq 给设置页加一个导出按钮
+$hiq-auto 给设置页加一个导出按钮，并一直推进到验收通过
 $hiq-debug 支付回调偶发重复入账
 $hiq-evolve Express 迁移到 Fastify，同时保持一个大版本的 API 兼容
 ```
@@ -152,7 +174,7 @@ Use `hiq-install` when the framework source changes and installed host/runtime c
 
 | Path | Purpose |
 |---|---|
-| `plugins/hiq/skills/` | the 11 retained skill definitions |
+| `plugins/hiq/skills/` | the 11 retained owner skills plus the optional `hiq-auto` wrapper |
 | `plugins/hiq/scripts/` | helper scripts for install, status, doctor, and CodeGraph |
 | `plugins/hiq/references/` | shared references, rules, routing maps, and templates |
 | `plugins/hiq/vendor/` | pinned runtime dependencies such as `codegraph-rs` metadata |
@@ -167,13 +189,13 @@ Use `hiq-install` when the framework source changes and installed host/runtime c
 - **CodeGraph-first**: shared-symbol understanding and impact analysis come before risky edits.
 - **Compact-safe continuity**: when context pressure rises, checkpoint first, then switch sessions.
 - **Fresh proof**: review and release should cite current evidence, not memory.
-- **Stable public surface**: strengthen the retained 11 before inventing new user-facing skills.
+- **Stable public surface**: retain the 11 owner skills; `hiq-auto` may wrap them, but should not replace them.
 
 - **HiQ 是唯一框架**：不再并行依赖 Trellis、do-it 或散装 workflow。
 - **CodeGraph-first**：共享符号、调用链和影响面先看清，再做高风险修改。
 - **Compact-safe 续作**：上下文压力升高时，先写 checkpoint，再切换会话。
 - **新鲜证据优先**：审查和放行要基于当前证据，而不是记忆或感觉。
-- **公开表面稳定**：优先加强现有 11 个 skill，而不是继续造新的用户可见 skill。
+- **公开表面稳定**：保留 11 个 owner skill；`hiq-auto` 可以做外层自动编排，但不替代 owner 本身。
 
 ## Related Documents | 相关文档
 
