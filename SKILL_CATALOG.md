@@ -28,10 +28,12 @@ This file explains what each retained HiQ owner skill does, plus the optional `h
 - Acts as the automatic outer wrapper for HiQ-managed project work.
 - Creates or refreshes a durable goal record under `.hiq/goals/`.
 - Repeatedly chooses the truthful current owner from the retained 11 and keeps going until acceptance is proven.
+- Routes back to `hiq-grill` when a goal still lacks approved spec, seam, or ticket-frontier truth.
 
 - 作为 HiQ 项目工作的自动外层 wrapper。
 - 在 `.hiq/goals/` 下创建或刷新 durable goal 记录。
 - 持续从 retained 11 中选择当前真实 owner，并一直推进到验收被证明通过。
+- 当目标还缺少已批准的 spec、seam 或 ticket frontier 时，会先退回 `hiq-grill`。
 
 **Use it when | 什么时候用**
 
@@ -213,21 +215,27 @@ $hiq-session handoff
 **Capability | 能力**
 
 - Turns unclear requests into an explicit execution contract.
+- Synthesizes the spec from known repo truth and conversation context.
 - Verifies local facts before asking the user decision questions.
-- Produces `grill.md` and approval-ready `IMPLEMENT.md`.
+- Chooses the highest useful seam before ticketing.
+- Produces `grill.md` and approval-ready `IMPLEMENT.md` with ticket frontier and blocking edges.
 
 - 把不够清晰的请求整理成明确的执行契约。
+- 基于仓库已知事实和当前对话综合出 spec。
 - 先验证本地事实，再问用户真正需要拍板的问题。
-- 产出 `grill.md` 和可批准的 `IMPLEMENT.md`。
+- 在切 ticket 前先确定最有价值的 seam。
+- 产出 `grill.md` 和可批准的 `IMPLEMENT.md`，其中包含 ticket frontier 和 blocking edges。
 
 **Use it when | 什么时候用**
 
-- Scope, acceptance, or approach is still unclear.
+- Scope, acceptance, seam, or approach is still unclear.
 - Research, architecture, interface, or domain pressure matters.
+- The work needs a real spec and ticket frontier before coding.
 - There are multiple valid approaches and a real trade-off exists.
 
-- 范围、验收标准或实现路线还不清楚。
+- 范围、验收标准、seam 或实现路线还不清楚。
 - 需要研究、架构、接口或领域澄清。
+- 编码前需要先形成真实的 spec 和 ticket frontier。
 - 有多个可行方案，确实存在取舍。
 
 **Common modes | 常用模式**
@@ -249,22 +257,28 @@ $hiq-grill 先帮我把这个需求整理成可执行计划
 
 **Capability | 能力**
 
-- Executes approved work one slice at a time.
-- Loads contract, spec, and graph context before risky edits.
-- Supports TDD, isolation, and bounded delegation.
+- Executes approved work one frontier slice at a time.
+- Loads contract, spec, seam plan, and graph context before risky edits.
+- Prefers public-behavior TDD when behavior lock matters.
+- Supports isolation and bounded delegation.
+- Treats wide refactors as an explicit exception, not the default execution shape.
 
-- 按批准后的契约逐 slice 执行。
-- 在高风险修改前装载契约、spec 和图谱上下文。
-- 支持 TDD、隔离 worktree 和边界清晰的委派。
+- 按批准后的契约逐个 frontier slice 执行。
+- 在高风险修改前装载契约、spec、seam 计划和图谱上下文。
+- 在需要锁行为时优先采用 public-behavior TDD。
+- 支持隔离 worktree 和边界清晰的委派。
+- 把 wide refactor 视为明确例外，而不是默认施工形态。
 
 **Use it when | 什么时候用**
 
 - An approved `IMPLEMENT.md` exists.
 - The next honest step is coding, not more planning.
+- The next unblocked frontier slice is ready to execute.
 - The work needs disciplined execution and progress tracking.
 
 - 已经有批准过的 `IMPLEMENT.md`。
 - 下一步真实动作是写代码，而不是继续规划。
+- 下一个未阻塞的 frontier slice 已经可以执行。
 - 工作需要规范的执行和进度收口。
 
 **Common modes | 常用模式**
@@ -480,9 +494,9 @@ If the project is in auto mode, start with `hiq-auto`.
 
 If the work is unclear and you are not using the auto wrapper, start with `hiq`.
 
-If the work is clear but needs a contract, go to `hiq-grill`.
+If the work is clear but still needs a spec, seam, or ticket frontier, go to `hiq-grill`.
 
-If the contract is approved and the real next step is code, use `hiq-implement`.
+If the contract is approved and the next unblocked frontier slice is code, use `hiq-implement`.
 
 If the problem is a failure with unclear cause, use `hiq-debug`.
 
@@ -490,9 +504,9 @@ If the work is materially done and the real question is proof, use `hiq-review`.
 
 如果不知道该用哪个 skill，就先从 `hiq` 开始。
 
-如果目标大致清楚，但还缺计划契约，用 `hiq-grill`。
+如果目标大致清楚，但还缺 spec、seam 或 ticket frontier，用 `hiq-grill`。
 
-如果契约已经批准，下一步真实动作是写代码，用 `hiq-implement`。
+如果契约已经批准，下一步真实动作是执行下一个未阻塞的 frontier slice，用 `hiq-implement`。
 
 如果问题是异常或故障，而且根因还不清楚，用 `hiq-debug`。
 
