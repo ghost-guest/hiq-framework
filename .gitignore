@@ -1,0 +1,14 @@
+.DS_Store
+.codegraph/
+.host-skills-liveagent/
+.cursor/profile/
+*.local.md
+context-checkpoints/
+
+# HiQ private profile and runtime state
+.hiq/profile/
+.hiq/session.md
+.hiq/current-change.json
+.hiq/runtime-manifest.json
+.hiq/changes/
+.hiq/eval/runs/

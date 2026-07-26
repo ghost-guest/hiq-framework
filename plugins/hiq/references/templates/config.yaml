@@ -1,0 +1,30 @@
+framework: hiq
+schema: 1
+language: zh-CN
+artifacts:
+  root: .hiq
+  session: .hiq/session.md
+  current_change: .hiq/current-change.json
+  eval_root: .hiq/eval
+resume:
+  prefer_local_state: true
+  require_checkpoint_before_handoff: true
+  status_command: bash "$HOME/.hiq/scripts/hiq-status.sh" .
+review:
+  require_fresh_evidence: true
+  eval_enabled: true
+  eval_config: .hiq/eval/eval.yaml
+skill:
+  retained_count: 11
+  stable_surface: true
+  compose_enabled: true
+  bundle_enabled: true
+  publish_enabled: true
+install:
+  managed_runtime_home: ~/.hiq
+  doctor_command: bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
+  host_targets:
+    - liveagent
+    - codex
+    - claude
+    - project

@@ -1,0 +1,16 @@
+{
+  "id": "codegraph",
+  "enabled": true,
+  "transport": "stdio",
+  "command": ".hiq/tools/codegraph",
+  "args": [
+    "serve",
+    "--mcp"
+  ],
+  "timeoutMs": 30000,
+  "hiq_portable": true,
+  "hiq_note": "command is project-relative; McpManager must set cwd to this workspace root. Do not use bare PATH 'codegraph' if ~/.local/bin has an older install. If host rejects non-ASCII cwd, use an ASCII symlink to the project as cwd.",
+  "hiq_command_windows": ".hiq/tools/codegraph.cmd",
+  "hiq_alt_command_path": "codegraph",
+  "hiq_require_cwd": true
+}

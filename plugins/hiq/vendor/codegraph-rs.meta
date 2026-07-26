@@ -1,0 +1,5 @@
+repo=https://github.com/Cleboost/codegraph-rs
+tag=v1.2.0
+target=aarch64-apple-darwin
+os=macos
+user_bin=~/.hiq/bin/codegraph

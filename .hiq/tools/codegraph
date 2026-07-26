@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+# Portable HiQ codegraph launcher (project-relative). Resolves managed binary at runtime.
+set -eu
+if [ -n "${HIQ_CODEGRAPH:-}" ] && [ -x "${HIQ_CODEGRAPH}" ]; then
+  exec "${HIQ_CODEGRAPH}" "$@"
+fi
+if [ -x "${HOME}/.hiq/bin/codegraph" ]; then
+  exec "${HOME}/.hiq/bin/codegraph" "$@"
+fi
+# HiQ repo layout (framework developers)
+ROOT="$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)"
+if [ -x "${ROOT}/plugins/hiq/bin/codegraph" ]; then
+  exec "${ROOT}/plugins/hiq/bin/codegraph" "$@"
+fi
+if [ -x "${ROOT}/plugins/hiq/scripts/codegraph.sh" ]; then
+  exec sh "${ROOT}/plugins/hiq/scripts/codegraph.sh" "$@"
+fi
+echo "hiq-codegraph: binary not found. Run hiq-install / install-codegraph on this machine." >&2
+exit 127

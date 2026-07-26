@@ -1,0 +1,13 @@
+{
+  "framework": "hiq",
+  "schema": 1,
+  "activeChange": ".hiq/changes/<id>/",
+  "phase": "idle",
+  "ownerSkill": "hiq-session",
+  "nextSkill": "hiq-session",
+  "nextStep": "rebuild pointer or start the first truthful owner skill",
+  "goalNow": "",
+  "acceptanceTarget": "",
+  "latestCheckpoint": null,
+  "updatedAt": "<timestamp>"
+}
