@@ -16,43 +16,55 @@
 - non-goals:
 - constraints:
 
-## 2. Expert board (silent)
+## 2. Spec synthesis / seam sketch
+
+- problem from user perspective:
+- solution from user perspective:
+- user-visible behaviors under change:
+- highest existing seam to test through:
+- new seam needed?: no | yes ->
+- seam confirmed with user?: no | yes | n/a
+
+## 3. Expert board (silent)
 
 | expert | support / must-be-true | blocker / veto | user decision? |
 |--------|------------------------|----------------|----------------|
 | PM | | | no \| yes: ... |
 | ARCH | | | |
 
-## 3. Confirmed facts
+## 4. Confirmed facts
 
 | id | premise | evidence | status |
 |----|---------|----------|--------|
 | F1 | | path / command / symbol | confirmed \| refuted |
 
-## 4. Decisions
+## 5. Decisions
 
 | id | question | experts | options | recommendation | status | choice |
 |----|----------|---------|---------|----------------|--------|--------|
 | D1 | | PM+ARCH | A / B | A because... | open \| chosen \| deferred | |
 
-## 5. Options / design pressure
+## 6. Options / design pressure
 
 | approach | why consider it | major risks | recommend? |
 |----------|------------------|-------------|------------|
 | A | | | yes \| no |
 
-## 6. Open blockers
+## 7. Open blockers
 
-## 7. Next question (at most one)
+## 8. Next question (at most one)
 
-## 8. IMPLEMENT contract
+## 9. IMPLEMENT contract
 
 - goal:
 - acceptance:
+- seams / public behaviors:
+- ticket frontier:
+- blocking edges:
 - slices:
 - verification:
 - route on approval: hiq-implement | hiq-debug | hiq-evolve
 
-## 9. Sediment for CONTEXT.md
+## 10. Sediment for CONTEXT.md
 
 - 

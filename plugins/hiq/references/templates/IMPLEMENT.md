@@ -8,6 +8,7 @@
 - **approved_by_user**: no | yes (message ref)
 - **owner_skill**: `hiq-implement`
 - **default_mode**: execute | tdd | isolate | delegate
+- **ticket_strategy**: vertical-slices | wide-refactor-exception
 - **active_slice**: Slice N | none
 - **grill**: `grill.md`
 - **verify baseline**: see §10
@@ -28,7 +29,15 @@
 - repo facts:
 - constraints:
 - codegraph / hotspots:
+- seams / public interfaces to test through:
 - already-correct paths to protect:
+
+## 4b. Spec / seam plan
+
+- synthesized behavior summary:
+- seam choice and why:
+- public behavior lock:
+- test boundary to avoid:
 
 ## 5. Approach (chosen)
 
@@ -62,21 +71,33 @@ Or: N/A because ...
 ## 8. Execution policy
 
 - **Spec / CONTEXT to load before code**:
+- **Seams / public behaviors to test through**:
 - **Default mode**: execute | tdd | isolate | delegate
+- **Ticket strategy**: vertical-slices | wide-refactor-exception
+- **Frontier rule**: only take the next unblocked slice
+- **Blocking edges / depends_on source**:
 - **When red-first TDD is required**:
 - **When isolation/worktree is required**:
 - **Delegation candidates and owned paths**:
 - **Stop and return to `hiq-grill` if**:
 - **Stop and return to `hiq-debug` if**:
 
-## 9. Slices (vertical, ordered)
+## 8b. Wide refactor exception (only if needed)
+
+- why vertical slices cannot stay green:
+- expand/contract or batch strategy:
+- intermediate compatibility rule:
+- final integrate-and-verify step:
+
+## 9. Slices (vertical, ordered frontier)
 
 ### Slice 1 — <name>
 
 - **mode**: execute | tdd | isolate | delegate
+- **depends_on**: none | Slice N
 - **outcome**:
 - **touch**: `path/a`, `path/b`
-- **preflight**: spec to load, graph anchors, tests to inspect
+- **preflight**: spec to load, graph anchors, tests to inspect, seam to use
 - **do**:
 - **don't**:
 - **verify**: `command`

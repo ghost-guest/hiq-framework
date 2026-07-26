@@ -70,8 +70,8 @@ hiq-auto       # optional outer goal wrapper; keeps choosing the truthful owner 
    ├─ hiq-install (host + doctor)
    ├─ hiq-init (project baseline + runtime state + CodeGraph + eval scaffold)
    ├─ hiq-session
-   ├─ hiq-grill      # grill.md + IMPLEMENT.md + decision/research/architecture contract
-   ├─ hiq-implement  # feature execution + spec load + slice self-check
+   ├─ hiq-grill      # synthesize spec + choose seams + approve ticket frontier
+   ├─ hiq-implement  # frontier slice execution + public-behavior TDD + slice self-check
    ├─ hiq-debug      # root-cause lane
    ├─ hiq-evolve     # evolution lane
    ├─ hiq-knowledge  # durable memory lane
@@ -97,14 +97,15 @@ ELSE ASK one focused decision question
 
 ## 7. 横切铁律
 
-1. **单一框架**：禁止回到 Trellis / do-it 并行工作流。  
-2. **少而厚**：优先给现有厚 skill 加 mode，不再 proliferate 薄 skill。  
-3. **Grill 纪律**：事实本地验证，用户只回答决策。  
-4. **CodeGraph-first**：debug / implement 优先使用 codegraph-rs。  
-5. **完成 = 证据**：`hiq-review` 内含 verify/check/demo/eval/closeout，不靠口头完成。  
-6. **脚本不挑系统**：关键 runtime / init / install / status / doctor surfaces 必须有真实 Windows 入口，不能只靠 bash wrapper 伪兼容。  
-7. **续作靠本地**：`hiq-session` 负责 checkpoint、status、resume-probe 与 compact-safe 恢复，聊天历史不是主状态。  
-8. **Debug 先证因后动手**：`hiq-debug` 必须冻结复现、记录假设循环、保护已正确路径。  
+1. **单一框架**：禁止回到 Trellis / do-it 并行工作流。
+2. **少而厚**：优先给现有厚 skill 加 mode，不再 proliferate 薄 skill。
+3. **Grill 纪律**：事实本地验证，用户只回答决策。
+4. **CodeGraph-first**：debug / implement 优先使用 codegraph-rs。
+5. **Spec/Ticket/TDD absorbed, not renamed**：`to-spec` / `to-tickets` / `tdd` 这类成熟做法优先内化到 `hiq-grill` / `hiq-implement`。
+6. **完成 = 证据**：`hiq-review` 内含 verify/check/demo/eval/closeout，不靠口头完成。
+7. **脚本不挑系统**：关键 runtime / init / install / status / doctor surfaces 必须有真实 Windows 入口，不能只靠 bash wrapper 伪兼容。
+8. **续作靠本地**：`hiq-session` 负责 checkpoint、status、resume-probe 与 compact-safe 恢复，聊天历史不是主状态。
+9. **Debug 先证因后动手**：`hiq-debug` 必须冻结复现、记录假设循环、保护已正确路径。
 
 ## 8. 默认文件角色
 

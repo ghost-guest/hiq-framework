@@ -4,8 +4,9 @@ description: >-
   HiQ 最大的前置规划与定约 skill。吸收原 decision / clarify / brainstorm /
   architect / arch-scan / domain / interface / slice / planning：负责先验证本地事实，
   再做 Proceed / Research First / Defer 分流，按 tier 控制提问预算，静默启用多专家会诊，
-  产出可批准的 `grill.md` 与 `IMPLEMENT.md`。核心原则：问题不清先定约，用户只回答真正
-  属于用户的决策，不为仓库本地能验证的事实买单。
+  产出可批准的 `grill.md` 与 `IMPLEMENT.md`。它吸收 `to-spec` / `to-tickets` 的成熟做法：
+  先综合当前事实写出 spec、尽早锁定测试 seam、再把执行拆成 vertical slices 与 blocking
+  edges。核心原则：问题不清先定约，用户只回答真正属于用户的决策，不为仓库本地能验证的事实买单。
 ---
 
 # hiq-grill — 立项 · 澄清 · 研究 · 架构 · 计划
@@ -15,9 +16,11 @@ description: >-
 - Proceed / Research First / Defer triage
 - Goal, scope, acceptance, non-goals, and constraint framing
 - Local fact verification before asking the user
+- Spec synthesis from current repo truth and conversation context
+- Seam selection for behavior verification before ticketing
 - Expert-council pressure on architecture, interface, domain, risk, and slices
 - Design trade-off comparison and recommendation
-- `grill.md` planning state and approved `IMPLEMENT.md`
+- `grill.md` planning state and approved `IMPLEMENT.md` with ticket frontier
 - Explicit handoff to `hiq-implement`, `hiq-debug`, or `hiq-evolve`
 
 ## Modes
@@ -33,6 +36,7 @@ description: >-
 ```text
 Planning is not question-asking theater.
 Verify local truth first.
+Synthesize the spec from what is already known.
 Ask only the highest-leverage user decision that the repo cannot answer.
 No product coding starts until the contract is explicit enough to approve.
 ```
@@ -79,6 +83,17 @@ STATE inspect_local_truth:
     true user-owned decisions
   never ask the user for facts the repo can answer
 
+STATE synthesize_spec:
+  turn the current request + local truth into a spec-sized planning summary
+  do not re-interview the user for information already present in the repo or chat
+  name:
+    problem from the user's perspective
+    target outcome from the user's perspective
+    user-visible behaviors that must change
+    major non-goals and constraints
+  if the work is behavior-sensitive:
+    sketch the highest useful test seam now
+
 STATE expert_board:
   activate only relevant experts from `grill-experts.md`
   run the board silently:
@@ -104,10 +119,13 @@ STATE frame_contract:
     smallest worthwhile result
     non-goals
     constraints
+    seam / behavior sketch
     interfaces / modules / user paths under pressure
     current truth and open blockers
   if the work touches multiple real approaches:
     compare them and pick a recommendation
+  prefer existing seams over new seams
+  keep the number of seams as low as truthfully possible
 
 STATE decision_gate:
   if a user-owned choice remains after local verification:
@@ -125,13 +143,15 @@ STATE plan_build:
     Goal
     Acceptance
     Current truth
+    Spec / seam plan
     Expert review
     Path map / affected surfaces
     Failure-mode forecast
     Execution policy
-    Slices with done-when
+    Vertical ticket slices with done-when and blocking edges
     Verification
     route on block
+  default to thin end-to-end slices; only use a wide-refactor plan when vertical slices cannot stay green
   if domain terms or invariants became clearer:
     capture sediment for `.hiq/CONTEXT.md`
 
@@ -174,11 +194,12 @@ Templates:
 
 - the requested outcome and smallest worthwhile result
 - confirmed facts vs still-open assumptions
+- the synthesized spec summary and chosen seam / behavior boundary
 - active experts and why they were relevant
 - question budget used and any pending user decision
 - non-goals, constraints, and interfaces under pressure
 - recommended approach and rejected alternatives when they mattered
-- slices, done-when, and verification path
+- slice frontier, blocking edges, done-when, and verification path
 - route-on-block and next owner skill
 
 ## Planning rules
@@ -187,8 +208,11 @@ Templates:
 2. One question per turn, and only for real user-owned trade-offs
 3. Expert council improves the plan, not the amount of chatter
 4. L0 stays short; do not force heavy architecture ceremony onto tiny reversible work
-5. If acceptance is weak, the plan is not done even if the implementation idea feels obvious
-6. When scope or truth changes midstream, refresh the contract instead of freelancing in chat
+5. Synthesize the spec from known truth before asking for more discovery theater
+6. Prefer one high seam and public behavior checks over many low-level test hooks
+7. Default to vertical end-to-end slices; use wide-refactor planning only when slices cannot stay green
+8. If acceptance is weak, the plan is not done even if the implementation idea feels obvious
+9. When scope or truth changes midstream, refresh the contract instead of freelancing in chat
 
 ## Announce
 

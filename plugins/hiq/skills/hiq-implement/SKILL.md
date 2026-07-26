@@ -4,8 +4,9 @@ description: >-
   HiQ 正式施工总控。吸收原 feature / implement / before-dev / tdd /
   worktree / delegate：基于批准的 IMPLEMENT.md 按 slice 落代码，先装载 spec 与
   CodeGraph 上下文，按风险决定是否 red-first TDD、隔离 worktree、委派独立子任务，
-  并在每个 slice 后用真实自查/自测与进度记录收口。核心原则：不越过批准契约施工，
-  不把“代码写完”当成“这个 slice 已交付”。
+  并在每个 slice 后用真实自查/自测与进度记录收口。它吸收 `to-tickets` / `tdd`
+  的成熟做法：只拿当前 frontier ticket，优先走 public-behavior tests，必要时才走
+  wide-refactor 例外。核心原则：不越过批准契约施工，不把“代码写完”当成“这个 slice 已交付”。
 ---
 
 # hiq-implement — 施工总控 · Slice 执行 · TDD · 隔离 · 委派
@@ -14,7 +15,7 @@ description: >-
 
 - Execution against an approved `IMPLEMENT.md`
 - Spec/context loading before code on L2+ work
-- One-slice-at-a-time delivery and progress capture
+- One frontier-slice-at-a-time delivery and progress capture
 - Risk-based red-first TDD
 - Worktree isolation for risky or parallel edits
 - Delegation of clearly independent subtasks
@@ -33,6 +34,7 @@ description: >-
 ```text
 Do not code past the approved contract.
 One slice at a time.
+Take the next unblocked slice, not the most tempting slice.
 A slice is not done when code exists.
 A slice is done when the promised outcome, checks, and recorded progress all agree.
 ```
@@ -68,6 +70,7 @@ STATE load_contract:
     Goal
     Acceptance
     Current truth
+    Spec / seam plan
     Expert review
     Path map / failure-mode forecast when present
     Execution policy
@@ -79,11 +82,13 @@ STATE load_contract:
     route back to hiq-grill
 
 STATE choose_slice:
-  select exactly one next unchecked slice unless the diff is truly one inseparable micro-change
+  select exactly one next unchecked slice on the current frontier unless the diff is truly one inseparable micro-change
+  honor explicit blocking edges / depends_on before choosing a slice
   restate for the active slice:
     outcome
     touch set
     do / do-not-touch boundaries
+    seam / public interface under test
     verify command
     done-when
   if scope drift appears before code starts:
@@ -102,9 +107,11 @@ STATE map_and_preflight:
 
 STATE tdd_lock:
   when mode=tdd or risk warrants it:
-    write the failing proof first
+    write the failing proof first at the highest truthful seam
     confirm it fails for the right reason
     turn green with the smallest truthful implementation
+    prefer tests through public behavior or stable interfaces
+    avoid tests that pin private helpers or implementation structure
     do not weaken the test to fit the code
 
 STATE isolate:
@@ -128,6 +135,7 @@ STATE implement:
   prefer existing local patterns, helpers, and contracts
   keep edits inside approved acceptance and non-goals
   do not silently bundle unrelated refactors
+  do not switch into wide-refactor mode unless the contract explicitly allows that exception
 
 STATE self_check:
   run in order:
@@ -181,10 +189,12 @@ Template: `plugins/hiq/references/templates/IMPLEMENT.md`
 `IMPLEMENT.md` and execution state must keep these recoverable:
 
 - approved goal and acceptance
-- exact active slice and next slice
+- exact active frontier slice and next slice
 - touched files / allowed scope
 - spec and CONTEXT loaded before code
 - CodeGraph anchors for shared-risk areas
+- seam / public behavior under test
+- blocking edges or explicit wide-refactor exception
 - whether TDD, isolation, or delegation is required and why
 - fresh verify commands and latest results
 - blockers, route changes, and next owner
@@ -194,10 +204,12 @@ Template: `plugins/hiq/references/templates/IMPLEMENT.md`
 1. One slice closes at a time; unfinished work stays visible in `tasks.md`
 2. Shared-symbol edits need CodeGraph context before broad changes
 3. L2+ work loads `.hiq/spec/...` before implementation
-4. TDD is a risk tool, not a ceremony tax; use it when behavior lock matters
-5. Isolation is required when the branch/worktree state makes merge ambiguity or regression risk too high
-6. Delegation needs an explicit return contract; otherwise keep the slice local
-7. If coding reveals a plan problem, return to `hiq-grill` instead of rewriting scope in place
+4. Take the next unblocked vertical slice unless the approved contract explicitly declares a wide-refactor exception
+5. TDD is a risk tool, not a ceremony tax; use it when behavior lock matters
+6. Test through public behavior or stable interfaces whenever possible; do not couple tests to internals
+7. Isolation is required when the branch/worktree state makes merge ambiguity or regression risk too high
+8. Delegation needs an explicit return contract; otherwise keep the slice local
+9. If coding reveals a plan problem, return to `hiq-grill` instead of rewriting scope in place
 
 ## Announce
 

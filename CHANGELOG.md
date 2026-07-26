@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.19 — 2026-07-26
+
+- folds the useful `mattpocock/skills` engineering flow into HiQ without expanding the public skill surface
+  - `hiq-grill` now explicitly owns spec synthesis from known truth, seam-first planning, and ticket-frontier design
+  - `hiq-implement` now explicitly owns frontier-only slice execution, public-behavior TDD, and the wide-refactor exception rule
+  - `hiq-auto` now routes back to planning when a goal still lacks approved spec / seam / ticket-frontier truth
+  - refreshes `grill.md`, `IMPLEMENT.md`, and `change-proposal.md` so the absorbed planning/execution contract is durable in local state
+
 ## 0.8.18 — 2026-07-26
 
 - adds a formal **cross-platform smoke matrix** for HiQ releases and framework changes

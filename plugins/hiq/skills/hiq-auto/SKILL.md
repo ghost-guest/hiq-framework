@@ -92,13 +92,15 @@ STATE ensure_goal_record:
     evidence ledger
   if goal or acceptance is still unclear:
     choose hiq-grill as next owner
+  if the work has no approved spec / seam / ticket frontier yet:
+    choose hiq-grill as next owner
 
 STATE choose_owner:
   choose the single truthful retained owner step:
     host/runtime install or health issue -> hiq-install
     missing baseline or stale project bootstrap -> hiq-init
     resume/status/checkpoint/pointer rebuild -> hiq-session
-    unclear scope/acceptance/plan -> hiq-grill
+    unclear scope/acceptance/plan/spec/ticket frontier -> hiq-grill
     approved implementation slice pending -> hiq-implement
     root cause unknown -> hiq-debug
     materially done but proof missing -> hiq-review

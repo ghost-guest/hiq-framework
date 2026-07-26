@@ -11,6 +11,13 @@
 
 ## Acceptance
 
+## Seams / behavior under test
+
+## Delivery shape
+
+- ticket strategy: vertical slices | wide refactor exception
+- blocking edges:
+
 ## Risks
 
 ## Rollback

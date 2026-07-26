@@ -40,6 +40,7 @@ HiQ is opinionated in four ways:
    Every request should have one truthful current owner skill.
 2. **11 thick skills instead of many thin ones**  
    New capabilities are absorbed into the retained surface instead of multiplying skill names.
+   HiQ absorbs patterns like `to-spec`, `to-tickets`, and `tdd` into `hiq-grill` / `hiq-implement` instead of exposing more names.
 3. **Local state over chat memory**  
    Work should be resumable from `.hiq/` and related artifacts, not from fragile conversation history.
 4. **Evidence before done**  
@@ -51,6 +52,7 @@ HiQ 有四个非常明确的设计取向：
    每个请求在任一时刻都应有一个真实的当前主 skill。
 2. **11 个厚 skill，而不是几十个薄 skill**  
    新能力优先吸收到保留表面，而不是继续膨胀名字数量。
+   像 `to-spec`、`to-tickets`、`tdd` 这样的成熟模式，也优先内化到 `hiq-grill` / `hiq-implement`，而不是继续新增名字。
 3. **本地状态优先于聊天记忆**  
    工作应当能从 `.hiq/` 等本地文件恢复，而不是依赖脆弱的上下文历史。
 4. **完成必须靠证据**  
@@ -114,8 +116,8 @@ $hiq-auto
 hiq-install   -> install or refresh the framework runtime on the host
 hiq-init      -> initialize a project with HiQ local state and CodeGraph
 hiq-session   -> rebuild or normalize the working session
-hiq-grill     -> make the work contract explicit
-hiq-implement -> execute the approved slices
+hiq-grill     -> synthesize the spec, lock seams, and approve the ticket frontier
+hiq-implement -> execute the approved frontier slices with TDD when behavior lock matters
 hiq-review    -> prove the result and decide release readiness
 ```
 
@@ -123,10 +125,20 @@ hiq-review    -> prove the result and decide release readiness
 hiq-install   -> 安装或刷新宿主上的 HiQ runtime
 hiq-init      -> 在项目中建立 HiQ 本地状态与 CodeGraph
 hiq-session   -> 重建或规范当前工作会话
-hiq-grill     -> 把目标、边界、验收标准写清楚
-hiq-implement -> 按批准的 slice 落地施工
+hiq-grill     -> 综合当前事实产出 spec、确认 seam、批准 ticket frontier
+hiq-implement -> 按批准的 frontier slice 施工，并在需要时用 TDD 锁行为
 hiq-review    -> 用证据验证结果并决定是否放行
 ```
+
+Absorbed engineering patterns:
+
+- `hiq-grill` now owns spec synthesis from known truth, seam-first planning, and ticket frontier design.
+- `hiq-implement` now owns frontier-only slice execution, public-behavior TDD, and the wide-refactor exception rule.
+
+已吸收的工程化模式：
+
+- `hiq-grill` 负责基于已知事实综合 spec、先定 seam、再设计 ticket frontier。
+- `hiq-implement` 负责只拿当前 frontier slice 施工、优先做 public-behavior TDD、并约束 wide-refactor 例外。
 
 Special lanes:
 
