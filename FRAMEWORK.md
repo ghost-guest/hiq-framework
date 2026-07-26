@@ -102,8 +102,9 @@ ELSE ASK one focused decision question
 3. **Grill 纪律**：事实本地验证，用户只回答决策。  
 4. **CodeGraph-first**：debug / implement 优先使用 codegraph-rs。  
 5. **完成 = 证据**：`hiq-review` 内含 verify/check/demo/eval/closeout，不靠口头完成。  
-6. **续作靠本地**：`hiq-session` 负责 checkpoint、status、resume-probe 与 compact-safe 恢复，聊天历史不是主状态。  
-7. **Debug 先证因后动手**：`hiq-debug` 必须冻结复现、记录假设循环、保护已正确路径。  
+6. **脚本不挑系统**：关键 runtime / init / install / status / doctor surfaces 必须有真实 Windows 入口，不能只靠 bash wrapper 伪兼容。  
+7. **续作靠本地**：`hiq-session` 负责 checkpoint、status、resume-probe 与 compact-safe 恢复，聊天历史不是主状态。  
+8. **Debug 先证因后动手**：`hiq-debug` 必须冻结复现、记录假设循环、保护已正确路径。  
 
 ## 8. 默认文件角色
 

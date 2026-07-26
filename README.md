@@ -164,6 +164,9 @@ $hiq-evolve Express 迁移到 Fastify，同时保持一个大版本的 API 兼�
 $hiq-install
 bash "$HOME/.hiq/scripts/hiq-status.sh" .
 bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
+# Windows
+%USERPROFILE%\\.hiq\\scripts\\hiq-status.cmd .
+%USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd .
 ```
 
 Use `hiq-install` when the framework source changes and installed host/runtime copies must be refreshed.
@@ -186,6 +189,7 @@ Use `hiq-install` when the framework source changes and installed host/runtime c
 ## Design Principles | 设计原则
 
 - **HiQ is the only framework**: no parallel Trellis / do-it / scattered workflow packages.
+- **Cross-platform by default**: HiQ should not assume macOS/Linux only; key runtime surfaces must have truthful Windows paths too.
 - **CodeGraph-first**: shared-symbol understanding and impact analysis come before risky edits.
 - **Compact-safe continuity**: when context pressure rises, checkpoint first, then switch sessions.
 - **Fresh proof**: review and release should cite current evidence, not memory.

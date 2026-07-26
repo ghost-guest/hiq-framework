@@ -25,31 +25,38 @@
 - why this owner is current:
 - evidence gap:
 - explicit blocker if any:
+- acceptance item still open:
 
-## 4. Owner ledger
+## 4. Owner transition ledger
 
-| step | owner | reason | result | next |
-|------|-------|--------|--------|------|
-| 1 | `hiq-...` | | | |
+| step | owner | mode | trigger | reason | result | next |
+|------|-------|------|---------|--------|--------|------|
+| 1 | `hiq-...` | | | | | |
 
-## 5. Required evidence for done
+## 5. Acceptance ledger
 
-- [ ] acceptance proof exists for the current revision
-- [ ] non-goals still hold
-- [ ] review verdict is pass / ready
+| item | required proof | current status | source |
+|------|----------------|----------------|--------|
+| A1 | | open | |
 
-## 6. User decisions
+## 6. Evidence ledger
+
+| time | owner | evidence | freshness | impact |
+|------|-------|----------|-----------|--------|
+| | `hiq-...` | command / demo / eval / review finding | fresh | |
+
+## 7. User decisions
 
 | id | question | why user-owned | status | answer |
 |----|----------|----------------|--------|--------|
 | D1 | | | open | |
 
-## 7. Handoff / checkpoint
+## 8. Handoff / checkpoint
 
 - latest_checkpoint:
 - resume command: `继续 <checkpoint path>` or `$hiq-auto`
 
-## 8. Final verdict
+## 9. Final verdict
 
 - accepted?: no | yes
 - review source:

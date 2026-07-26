@@ -106,7 +106,10 @@ STATE backup_rule:
   do not promise safe rollback unless backup paths are real
 
 STATE apply_or_repair:
-  use the canonical installer path (`install.sh` / `plugins/hiq/scripts/install-skills.sh`) or equivalent truthful steps
+  use the canonical installer path:
+    macOS/Linux -> `install.sh` or `plugins/hiq/scripts/install-skills.sh`
+    Windows -> `plugins/hiq/scripts/install-skills.cmd` or `plugins/hiq/scripts/install-skills.ps1`
+  or equivalent truthful steps
   ensure these surfaces stay aligned:
     host skill copies
     `_hiq-references`

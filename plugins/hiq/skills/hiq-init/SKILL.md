@@ -109,10 +109,12 @@ STATE fill:
 
 STATE codegraph:
   always use the HiQ-managed binary path, never random PATH resolution
-  on macOS/Linux:
-    use `hiq-run.sh project-init <root>` or `codegraph-project-init.sh <root>`
-  on Windows:
-    prefer `hiq-run.cmd project-init <root>` or `codegraph-project-init.cmd <root>`
+  for the HiQ scaffold itself:
+    on macOS/Linux use `hiq-run.sh init-project <root>` or `init-project.sh <root>`
+    on Windows prefer `hiq-run.cmd init-project <root>` or `init-project.cmd <root>`
+  for the CodeGraph step:
+    on macOS/Linux use `hiq-run.sh project-init <root>` or `codegraph-project-init.sh <root>`
+    on Windows prefer `hiq-run.cmd project-init <root>` or `codegraph-project-init.cmd <root>`
   the CodeGraph step must:
     install managed binary if missing
     initialize `.codegraph/`
@@ -175,11 +177,20 @@ STATE report:
 - `plugins/hiq/references/templates/current-change.json`
 - `plugins/hiq/references/templates/eval.yaml`
 - `plugins/hiq/scripts/init-project.sh`
+- `plugins/hiq/scripts/init-project.cmd`
+- `plugins/hiq/scripts/init-project.ps1`
 - `plugins/hiq/scripts/hiq-run.sh`
+- `plugins/hiq/scripts/hiq-run.cmd`
 - `plugins/hiq/scripts/hiq-status.sh`
+- `plugins/hiq/scripts/hiq-status.cmd`
+- `plugins/hiq/scripts/hiq-status.ps1`
 - `plugins/hiq/scripts/hiq-doctor.sh`
+- `plugins/hiq/scripts/hiq-doctor.cmd`
+- `plugins/hiq/scripts/hiq-doctor.ps1`
 - `plugins/hiq/scripts/codegraph-project-init.sh`
+- `plugins/hiq/scripts/codegraph-project-init.cmd`
 - `plugins/hiq/scripts/install-codegraph.sh`
+- `plugins/hiq/scripts/install-codegraph.cmd`
 
 ## Gates
 

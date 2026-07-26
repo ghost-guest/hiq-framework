@@ -7,7 +7,7 @@ TASK="${1:-}"
 shift || true
 
 if [[ -z "$TASK" ]]; then
-  echo "usage: hiq-run.sh install-codegraph|project-init|configure-mcp|codegraph|status|doctor [...]" >&2
+  echo "usage: hiq-run.sh install-codegraph|project-init|init-project|install-skills|configure-mcp|codegraph|status|doctor [...]" >&2
   exit 2
 fi
 
@@ -16,6 +16,8 @@ if [[ "$OS" == "windows" ]]; then
   case "$TASK" in
     install-codegraph) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/install-codegraph.cmd" 2>/dev/null || echo "$SCRIPT_DIR/install-codegraph.cmd")" "$@" ;;
     project-init) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/codegraph-project-init.cmd" 2>/dev/null || echo "$SCRIPT_DIR/codegraph-project-init.cmd")" "$@" ;;
+    init-project) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/init-project.cmd" 2>/dev/null || echo "$SCRIPT_DIR/init-project.cmd")" "$@" ;;
+    install-skills) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/install-skills.cmd" 2>/dev/null || echo "$SCRIPT_DIR/install-skills.cmd")" "$@" ;;
     configure-mcp) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/configure-codegraph-mcp.cmd" 2>/dev/null || echo "$SCRIPT_DIR/configure-codegraph-mcp.cmd")" "$@" ;;
     codegraph) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/codegraph.cmd" 2>/dev/null || echo "$SCRIPT_DIR/codegraph.cmd")" "$@" ;;
     status) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/hiq-status.cmd" 2>/dev/null || echo "$SCRIPT_DIR/hiq-status.cmd")" "$@" ;;
@@ -26,6 +28,8 @@ fi
 case "$TASK" in
   install-codegraph) exec bash "$SCRIPT_DIR/install-codegraph.sh" "$@" ;;
   project-init) exec bash "$SCRIPT_DIR/codegraph-project-init.sh" "$@" ;;
+  init-project) exec bash "$SCRIPT_DIR/init-project.sh" "$@" ;;
+  install-skills) exec bash "$SCRIPT_DIR/install-skills.sh" "$@" ;;
   configure-mcp) exec bash "$SCRIPT_DIR/configure-codegraph-mcp.sh" "$@" ;;
   codegraph) exec bash "$SCRIPT_DIR/codegraph.sh" "$@" ;;
   status) exec bash "$SCRIPT_DIR/hiq-status.sh" "$@" ;;

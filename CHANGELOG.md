@@ -5,6 +5,8 @@
 - adds `hiq-auto` as an **optional auto-goal orchestration wrapper**
   - keeps the retained owner surface at 11 while adding a project-level automatic entrypoint
   - adds `AGENTS.md`, auto-mode config, and `.hiq/goals/` goal-record workflow so new conversations can enter the goal loop by default
+  - expands the goal model with owner transition, acceptance, and evidence ledgers
+  - adds Windows-native script surfaces for `init-project`, `install-skills`, `hiq-status`, and `hiq-doctor`
   - teaches templates/docs/routing that `hiq-auto` keeps choosing truthful owner steps until `hiq-review` proves acceptance or a real blocker is recorded
   - syncs README / FRAMEWORK / catalog / routing / bootstrap/config/init surfaces with the wrapper model
 

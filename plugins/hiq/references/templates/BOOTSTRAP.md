@@ -44,6 +44,9 @@ When context pressure rises, write a checkpoint under `context-checkpoints/` and
 ```bash
 bash "$HOME/.hiq/scripts/hiq-status.sh" .
 bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
+# Windows
+%USERPROFILE%\\.hiq\\scripts\\hiq-status.cmd .
+%USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd .
 ```
 
 ## Resume

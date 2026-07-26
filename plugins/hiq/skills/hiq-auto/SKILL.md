@@ -87,6 +87,9 @@ STATE ensure_goal_record:
     next owner skill
     blockers / user decision needed
     latest evidence gap
+    owner transition ledger
+    acceptance ledger
+    evidence ledger
   if goal or acceptance is still unclear:
     choose hiq-grill as next owner
 
@@ -103,6 +106,7 @@ STATE choose_owner:
     durable ADR/lesson/casebook/audit capture needed -> hiq-knowledge
     framework/skill governance change needed -> hiq-skill
     otherwise -> hiq
+  append owner transition row into the goal ledger
   write owner + reason into goal record and session pointer
 
 STATE drive_step:
@@ -112,6 +116,7 @@ STATE drive_step:
     `.hiq/session.md`
     `.hiq/current-change.json`
     `.hiq/goals/<id>.md`
+  refresh acceptance ledger and evidence ledger using the latest owner output
   ask:
     is the goal complete?
     are all acceptance items proven for this revision?
@@ -147,7 +152,7 @@ STATE handoff:
 |----------|------|------|
 | Project rule | `AGENTS.md` | auto-load `hiq-auto` for new conversations when host honors AGENTS |
 | Runtime config | `.hiq/config.yaml` | auto-mode flags and goal policy |
-| Goal record | `.hiq/goals/<id>.md` | outer orchestration state and completion bar |
+| Goal record | `.hiq/goals/<id>.md` | outer orchestration state, owner transition ledger, and completion bar |
 | Session packet | `.hiq/session.md` | current truthful pointer for resumes |
 | Change pointer | `.hiq/current-change.json` | machine-readable next owner and goal state |
 | Owner artifacts | `.hiq/changes/<id>/...` | grill / implement / debug / review / evolve / skill artifacts |

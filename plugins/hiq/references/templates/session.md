@@ -18,6 +18,8 @@
 - **current_change_record**: `.hiq/current-change.json`
 - **status_command**: `bash "$HOME/.hiq/scripts/hiq-status.sh" .`
 - **doctor_command**: `bash "$HOME/.hiq/scripts/hiq-doctor.sh" .`
+- **status_command_windows**: `%USERPROFILE%\.hiq\scripts\hiq-status.cmd .`
+- **doctor_command_windows**: `%USERPROFILE%\.hiq\scripts\hiq-doctor.cmd .`
 
 ## Work Now
 
