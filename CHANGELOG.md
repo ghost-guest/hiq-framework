@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.20 — 2026-07-26
+
+- tightens HiQ runtime truth so framework health is proven instead of inferred
+  - fixes `hiq-doctor` on POSIX and Windows so a repo without `.codegraph/` now reports `overall=partial` instead of a false green
+  - fixes the Windows `project-init` fallback so portable MCP wiring no longer degrades to bare PATH `codegraph` assumptions when Python is unavailable
+  - adds Windows PowerShell MCP fallback wiring and platform-aware Codex MCP config generation
+  - adds runnable smoke entrypoints: `hiq-smoke.sh`, `hiq-smoke.cmd`, `hiq-smoke.ps1`, plus `hiq-run ... smoke`
+  - adds GitHub Actions smoke coverage for Ubuntu and Windows through `.github/workflows/hiq-smoke.yml`
+  - updates the cross-platform smoke contract so CodeGraph absence is explicitly treated as incomplete initialization, not healthy state
+
 ## 0.8.19 — 2026-07-26
 
 - folds the useful `mattpocock/skills` engineering flow into HiQ without expanding the public skill surface

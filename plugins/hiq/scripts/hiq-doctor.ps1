@@ -72,7 +72,7 @@ $runtimeChecks = [ordered]@{
 }
 
 $runtimeOk = $true
-foreach ($value in @($runtimeChecks.codegraphBin, $runtimeChecks.hiqRun, $runtimeChecks.hiqStatus, $runtimeChecks.hiqDoctor)) {
+foreach ($value in @($runtimeChecks.codegraphBin, $runtimeChecks.codegraphIndex, $runtimeChecks.hiqRun, $runtimeChecks.hiqStatus, $runtimeChecks.hiqDoctor)) {
   if ($value -ne "ok") { $runtimeOk = $false }
 }
 

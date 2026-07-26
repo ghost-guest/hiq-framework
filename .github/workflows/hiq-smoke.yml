@@ -1,0 +1,30 @@
+name: HiQ Smoke
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke-posix:
+    name: Smoke (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run HiQ smoke
+        run: bash plugins/hiq/scripts/hiq-smoke.sh
+
+  smoke-windows:
+    name: Smoke (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run HiQ smoke
+        shell: cmd
+        run: plugins\hiq\scripts\hiq-smoke.cmd

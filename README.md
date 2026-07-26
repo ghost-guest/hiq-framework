@@ -186,12 +186,15 @@ $hiq-evolve Express 迁移到 Fastify，同时保持一个大版本的 API 兼�
 $hiq-install
 bash "$HOME/.hiq/scripts/hiq-status.sh" .
 bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
+bash plugins/hiq/scripts/hiq-smoke.sh
 # Windows
 %USERPROFILE%\\.hiq\\scripts\\hiq-status.cmd .
 %USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd .
+plugins\hiq\scripts\hiq-smoke.cmd
 ```
 
 Use `hiq-install` when the framework source changes and installed host/runtime copies must be refreshed.
+Run `hiq-smoke` after runtime, init, MCP, or portability changes so health claims stay evidence-backed.
 
 当框架源码发生变化、需要同步已安装的宿主副本和 runtime 副本时，使用 `hiq-install`。
 

@@ -47,34 +47,10 @@ if not exist "%ROOT%\.codegraph" (
 "%BIN%" status --path "%ROOT%"
 
 REM MCP wiring — portable (no absolute machine paths)
-where py >nul 2>&1
-if not errorlevel 1 (
-  py -3 "%SCRIPT_DIR%lib\codegraph_mcp.py" "%ROOT%"
-  goto :mcp_done
-)
-where python >nul 2>&1
-if not errorlevel 1 (
-  python "%SCRIPT_DIR%lib\codegraph_mcp.py" "%ROOT%"
-  goto :mcp_done
-)
-where python3 >nul 2>&1
-if not errorlevel 1 (
-  python3 "%SCRIPT_DIR%lib\codegraph_mcp.py" "%ROOT%"
-  goto :mcp_done
-)
-echo hiq-cg-init: warn — no Python; writing portable mcp-liveagent.json via cmd
-if not exist "%ROOT%\.hiq\graph" mkdir "%ROOT%\.hiq\graph"
-if not exist "%ROOT%\.hiq\tools" mkdir "%ROOT%\.hiq\tools"
-> "%ROOT%\.hiq\graph\mcp-liveagent.json" (
-  echo {
-  echo   "id": "codegraph",
-  echo   "enabled": true,
-  echo   "transport": "stdio",
-  echo   "command": "codegraph",
-  echo   "args": ["serve", "--mcp"],
-  echo   "timeoutMs": 30000,
-  echo   "hiq_portable": true
-  echo }
+call "%SCRIPT_DIR%configure-codegraph-mcp.cmd" "%ROOT%"
+if errorlevel 1 (
+  echo hiq-cg-init: FAILED - portable MCP wiring failed
+  exit /b 1
 )
 
 :mcp_done

@@ -7,7 +7,7 @@ TASK="${1:-}"
 shift || true
 
 if [[ -z "$TASK" ]]; then
-  echo "usage: hiq-run.sh install-codegraph|project-init|init-project|install-skills|configure-mcp|codegraph|status|doctor [...]" >&2
+  echo "usage: hiq-run.sh install-codegraph|project-init|init-project|install-skills|configure-mcp|codegraph|status|doctor|smoke [...]" >&2
   exit 2
 fi
 
@@ -22,6 +22,7 @@ if [[ "$OS" == "windows" ]]; then
     codegraph) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/codegraph.cmd" 2>/dev/null || echo "$SCRIPT_DIR/codegraph.cmd")" "$@" ;;
     status) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/hiq-status.cmd" 2>/dev/null || echo "$SCRIPT_DIR/hiq-status.cmd")" "$@" ;;
     doctor) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/hiq-doctor.cmd" 2>/dev/null || echo "$SCRIPT_DIR/hiq-doctor.cmd")" "$@" ;;
+    smoke) exec cmd.exe /c "$(cygpath -w "$SCRIPT_DIR/hiq-smoke.cmd" 2>/dev/null || echo "$SCRIPT_DIR/hiq-smoke.cmd")" "$@" ;;
   esac
 fi
 
@@ -34,5 +35,6 @@ case "$TASK" in
   codegraph) exec bash "$SCRIPT_DIR/codegraph.sh" "$@" ;;
   status) exec bash "$SCRIPT_DIR/hiq-status.sh" "$@" ;;
   doctor) exec bash "$SCRIPT_DIR/hiq-doctor.sh" "$@" ;;
+  smoke) exec bash "$SCRIPT_DIR/hiq-smoke.sh" "$@" ;;
   *) echo "unknown task: $TASK" >&2; exit 2 ;;
 esac

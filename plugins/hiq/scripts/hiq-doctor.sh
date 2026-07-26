@@ -59,7 +59,7 @@ global_scripts_status="$(check_file "$HIQ_HOME/scripts/hiq-run.sh")"
 global_status_status="$(check_file "$HIQ_HOME/scripts/hiq-status.sh")"
 global_doctor_status="$(check_file "$HIQ_HOME/scripts/hiq-doctor.sh")"
 
-for s in "$global_scripts_status" "$global_status_status" "$global_doctor_status" "$codegraph_status"; do
+for s in "$global_scripts_status" "$global_status_status" "$global_doctor_status" "$codegraph_status" "$codegraph_index"; do
   if [[ "$s" != "ok" ]]; then
     runtime_ok=false
   fi

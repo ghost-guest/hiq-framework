@@ -104,12 +104,19 @@ def write_codex() -> None:
         return
     cfg = codex / "config.toml"
     text = cfg.read_text(encoding="utf-8") if cfg.exists() else ""
-    # Portable: sh + $HOME/.hiq/bin (not /Users/...), avoids PATH shadow by 0.9.x
-    block = (
-        "\n[mcp_servers.codegraph]\n"
-        'command = "sh"\n'
-        'args = ["-c", "exec \\"$HOME/.hiq/bin/codegraph\\" serve --mcp"]\n'
-    )
+    if os.name == "nt":
+        block = (
+            "\n[mcp_servers.codegraph]\n"
+            'command = "cmd"\n'
+            'args = ["/c", "\\\"%USERPROFILE%\\\\.hiq\\\\bin\\\\codegraph.exe\\\" serve --mcp"]\n'
+        )
+    else:
+        # Portable: sh + $HOME/.hiq/bin (not /Users/...), avoids PATH shadow by 0.9.x
+        block = (
+            "\n[mcp_servers.codegraph]\n"
+            'command = "sh"\n'
+            'args = ["-c", "exec \\"$HOME/.hiq/bin/codegraph\\" serve --mcp"]\n'
+        )
     if "[mcp_servers.codegraph]" in text:
         lines = text.splitlines(keepends=True)
         out = []

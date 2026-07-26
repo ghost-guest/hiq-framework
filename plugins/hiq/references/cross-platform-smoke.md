@@ -23,6 +23,7 @@ A smoke pass is acceptable only when all of these are true:
 - project init can create a new `.hiq/` baseline
 - project rule / auto entry is present after init
 - status and doctor commands run from the platform-native entrypoint
+- doctor reports `overall=partial` before CodeGraph init and `overall=ok` only after `.codegraph/` exists
 - installed runtime copies include the expected scripts and skills
 - no committed template forces machine-absolute paths or a single shell assumption
 
@@ -33,6 +34,16 @@ A smoke pass is acceptable only when all of these are true:
 | macOS | `bash`, native terminal | init, install sync, status, doctor |
 | Linux | `bash`, native terminal | init, install sync, status, doctor |
 | Windows | `cmd` + PowerShell | init, install sync, status, doctor |
+
+One-command smoke helpers:
+
+```bash
+bash plugins/hiq/scripts/hiq-smoke.sh
+```
+
+```bat
+plugins\hiq\scripts\hiq-smoke.cmd
+```
 
 ## 1. New project init
 
