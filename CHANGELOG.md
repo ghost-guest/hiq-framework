@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.22 — 2026-07-26
+
+- fixes Windows dispatcher argument forwarding so `hiq-run.cmd init-project <root>` no longer misreads the task token as the root path
+  - rewrites the Windows dispatcher to forward only the shifted arguments to the target command
+  - adds a dispatcher regression check to the smoke path so the bug is caught in CI instead of after a manual Windows init run
+  - keeps the POSIX smoke path aligned by asserting the dispatcher can create a requested init root without creating a stray `init-project` sibling path
+
 ## 0.8.21 — 2026-07-26
 
 - makes `hiq-auto` project entry and owner selection auditable from local state instead of chat inference

@@ -64,6 +64,15 @@ try {
   if ($previewOut -notmatch 'skill=hiq-auto') { Fail 'install preview missing hiq-auto' }
   if ($previewOut -notmatch 'mode=preview') { Fail 'install preview did not stay in preview mode' }
 
+  $dispatcherRoot = Join-Path $repoRoot 'tmp\hiq-dispatcher-smoke-project'
+  $dispatcherWrong = Join-Path $repoRoot 'init-project'
+  if (Test-Path -LiteralPath $dispatcherRoot) { Remove-Item -LiteralPath $dispatcherRoot -Recurse -Force }
+  if (Test-Path -LiteralPath $dispatcherWrong) { Remove-Item -LiteralPath $dispatcherWrong -Recurse -Force }
+  New-Item -ItemType Directory -Path $dispatcherRoot -Force | Out-Null
+  & (Join-Path $scriptDir 'hiq-run.cmd') 'init-project' $dispatcherRoot | Out-Null
+  if (-not (Test-Path -LiteralPath (Join-Path $dispatcherRoot '.hiq'))) { Fail 'dispatcher init-project did not create .hiq at requested root' }
+  if (Test-Path -LiteralPath $dispatcherWrong) { Fail 'dispatcher created stray init-project path' }
+
   Write-Output 'smoke:'
   Write-Output '- Windows init-project surface: source-complete'
   Write-Output '- Windows project-init surface: source-complete'
@@ -74,5 +83,9 @@ try {
 } finally {
   if (-not $Keep -and (Test-Path -LiteralPath $SmokeRoot)) {
     Remove-Item -LiteralPath $SmokeRoot -Recurse -Force
+  }
+  $dispatcherRoot = Join-Path $repoRoot 'tmp\hiq-dispatcher-smoke-project'
+  if (Test-Path -LiteralPath $dispatcherRoot) {
+    Remove-Item -LiteralPath $dispatcherRoot -Recurse -Force
   }
 }

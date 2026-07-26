@@ -6,9 +6,12 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 SMOKE_ROOT="${1:-$REPO_ROOT/tmp/hiq-smoke-project}"
 KEEP="${2:-}"
 
+DISPATCHER_ROOT="$REPO_ROOT/tmp/hiq-dispatcher-smoke-project"
+mkdir -p "$DISPATCHER_ROOT"
+
 cleanup() {
   if [[ "$KEEP" != "--keep" ]]; then
-    rm -rf "$SMOKE_ROOT"
+    rm -rf "$SMOKE_ROOT" "$DISPATCHER_ROOT"
   fi
 }
 trap cleanup EXIT
@@ -55,6 +58,16 @@ grep -q '"hiq_command_windows": ".hiq/tools/codegraph.cmd"' "$SMOKE_ROOT/.hiq/gr
 preview_out="$(bash "$SCRIPT_DIR/install-skills.sh" liveagent '' 0)"
 echo "$preview_out" | grep -q 'skill=hiq-auto' || fail 'install preview missing hiq-auto'
 echo "$preview_out" | grep -q 'mode=preview' || fail 'install preview did not stay in preview mode'
+
+DISPATCHER_ROOT="$REPO_ROOT/tmp/hiq-dispatcher-smoke-project"
+rm -rf "$DISPATCHER_ROOT"
+mkdir -p "$DISPATCHER_ROOT"
+bash "$SCRIPT_DIR/hiq-run.sh" init-project "$DISPATCHER_ROOT" >/dev/null
+test -d "$DISPATCHER_ROOT/.hiq" || fail 'dispatcher init-project did not create .hiq at requested root'
+
+if [[ -e "$REPO_ROOT/init-project" ]]; then
+  fail 'dispatcher created stray init-project path'
+fi
 
 echo 'smoke:'
 echo '- macOS/Linux init-project: passed'
