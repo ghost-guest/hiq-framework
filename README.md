@@ -207,6 +207,7 @@ Use `hiq-install` when the framework source changes and installed host/runtime c
 - [SKILL_CATALOG.md](./SKILL_CATALOG.md)
 - [ANALYSIS.md](./ANALYSIS.md)
 - [plugins/hiq/references/replacement-map.md](./plugins/hiq/references/replacement-map.md)
+- [plugins/hiq/references/cross-platform-smoke.md](./plugins/hiq/references/cross-platform-smoke.md)
 
 ## Engine | 引擎
 

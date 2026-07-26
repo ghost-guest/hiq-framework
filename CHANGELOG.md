@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.18 — 2026-07-26
+
+- adds a formal **cross-platform smoke matrix** for HiQ releases and framework changes
+  - introduces `plugins/hiq/references/cross-platform-smoke.md`
+  - defines the minimum macOS / Linux / Windows validation surface for init, install sync, dispatcher, status, and doctor
+  - makes release-time portability reporting explicit instead of implied
+
 ## 0.8.17 — 2026-07-26
 
 - adds `hiq-auto` as an **optional auto-goal orchestration wrapper**

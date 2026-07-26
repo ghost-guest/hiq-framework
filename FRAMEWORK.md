@@ -121,6 +121,7 @@ ELSE ASK one focused decision question
 - `install.md`：宿主目标/同步计划/运行时健康/doctor/阻塞原因
 - `evidence.md`：新鲜证据
 - `eval/`：本地评估配置与运行报告
+- `references/cross-platform-smoke.md`：跨平台 smoke 验证矩阵
 
 ## 9. 成功标准
 
