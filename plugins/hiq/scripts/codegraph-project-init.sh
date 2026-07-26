@@ -60,6 +60,7 @@ echo "$idx"
 
 # MCP non-interactive — portable paths only (no machine-absolute paths in configs)
 python3 "$SCRIPT_DIR/lib/codegraph_mcp.py" "$ROOT"
+python3 "$SCRIPT_DIR/lib/update_runtime_manifest.py" "$ROOT" "$BIN"
 
 echo "hiq-cg-init: done os=$OS root=$ROOT binary=$BIN (MCP configs are portable)"
 exit 0

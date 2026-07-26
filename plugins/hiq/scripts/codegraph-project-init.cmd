@@ -78,5 +78,11 @@ if not exist "%ROOT%\.hiq\tools" mkdir "%ROOT%\.hiq\tools"
 )
 
 :mcp_done
+where powershell >nul 2>&1
+if errorlevel 1 (
+  echo hiq-cg-init: warn - powershell not found; runtime-manifest.json not refreshed
+) else (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%lib\update_runtime_manifest.ps1" -Root "%ROOT%" -Bin "%BIN%"
+)
 echo hiq-cg-init: done os=windows root=%ROOT% binary=%BIN%
 exit /b 0
