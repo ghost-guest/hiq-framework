@@ -15,6 +15,7 @@
 | [Aegis](https://github.com/GanyuanRan/Aegis) | baseline / evidence / drift | baseline-first；完成前证据；七层根因；反熵增/退役；fast path | 多宿主装机复杂度 |
 | [COMPASS](https://github.com/dongshuyan/compass-skills) | profile / task forest / handoff | 澄清门；任务 DAG；会话交接；skill 自进化 | 学术润色 skill 非工程主线 |
 | [CodeStable](https://github.com/codestable/CodeStable) | req / epic / feature / issue / decision | **人在环 + 软件要素中心**；根路由；Quick/Standard/Goal；skill 评测闭环 | 完整 32 skill 照搬（过重） |
+| [mattpocock/skills engineering](https://github.com/mattpocock/skills/tree/main/skills/engineering) | idea / spec / issues / tdd | `to-spec` 的无多余采访综合、`to-tickets` 的 vertical slice + blocking edges、`tdd` 的 public-behavior red-green | 原样保留多个薄入口名 |
 | [web-dev-skills / T-Tools](https://github.com/timzaak/web-dev-skills) | PRD / design / phase task | 阶段门（backend→frontend→demo）；人校准口播；check 可选 | 强绑定 Rust/React 栈细节 |
 
 ## 逐项精华
@@ -80,11 +81,21 @@
 - skill 用 Spec 状态机 + decision fixtures 评测
 - **对 HiQ**：实体模型、目录布局、路由哲学、通道分级几乎直接继承并精简
 
-### 10. T-Tools — 阶段化交付
+### 10. mattpocock/skills engineering — 轻量工程编排
+
+- `to-spec`：先基于当前上下文与仓库事实综合 spec，而不是先发起一串采访式问题
+- `to-tickets`：优先 vertical slices，显式 blocking edges，只在必要时允许 wide refactor 例外
+- `tdd`：先确认最高价值的测试 seam，再走 red → green；测试优先锁 public behavior，不绑定私有实现
+- **对 HiQ**：这些能力不新建 skill 名，而是内化到 `hiq-grill` / `hiq-implement` / `hiq-auto`
+  - `hiq-grill` 吸收 spec synthesis、seam-first planning、ticket frontier
+  - `hiq-implement` 吸收 frontier-only slice execution、public-behavior TDD、wide-refactor exception
+  - `hiq-auto` 吸收“缺 spec / seam / frontier 就先退回 planning”
+
+### 11. T-Tools — 阶段化交付
 
 - Decision → tech-research → PRD → design → task(phase) → run → demo → accept → publish
 - 可选 check 阶段；强制人校准
-- **对 HiQ**：`hiq-feature` Standard/Heavy 的 phase 切片；demo/accept 作为验收形态
+- **对 HiQ**：phase gate 与 demo/accept 的验收形态仍然有价值，但内化到 `hiq-grill` / `hiq-review`
 
 ## 合成决策（HiQ 取舍）
 
@@ -95,12 +106,13 @@
 | 架构阶段 | architecture-copilot | 写码前约束质量最高 |
 | 变更形态 | Rasen-like change folder | propose/apply/archive 可审计 |
 | 外部学习 | Assay 语义内化到 hiq-study | 不依赖 Assay CLI |
-| 个人层 | COMPASS 精简 4 件套 | hiq-profile / handoff / clarify / skill 进化 |
+| 个人层 | COMPASS 精简续作语义 | 继续保留在 `hiq-session` / `hiq-knowledge` / `hiq-skill` |
 | 专家层 | 路由 hint 而非角色 cast | 降低表演成本 |
+| 工程吸收 | Matt engineering patterns | `to-spec`→`hiq-grill`，`to-tickets`/`tdd`→`hiq-implement`，缺前置真相时 `hiq-auto` 回退规划 |
 | 上下文 | Headroom 原则 + 文件落盘 | 防 context window 爆 |
 | 安全 | keysmith 的 dry-run/backup only | 不碰 jailbreak 指令 |
-| Trellis | session/continue/finish/spec/check/break-loop | 会话与规范 OS |
-| do-it | router/grill/slice/fix-loop/verify/interface/… | 定级与工程门禁 |
+| Trellis | session/continue/finish/spec/check/break-loop | 会话与规范 OS，最终内化到 retained 11 |
+| do-it | router/grill/slice/fix-loop/verify/interface/… | 定级与工程门禁，最终内化到 retained 11 |
 
 ## 定位（已修正）
 
@@ -111,6 +123,7 @@ HiQ **完全替代** Trellis / do-it / Assay / CodeStable 等方法包作为日�
 
 1. 不维护 30+ 兼容旧 skill 名。
 2. 不内置多宿主 plugin 矩阵（先服务 LiveAgent / Codex skill 形态）。
-3. 不强制 TDD；默认 off，高风险可开。
-4. 不自动多 agent 编排；需要时 `hiq-delegate`，写清 owner 与返回契约。
-5. 不捆绑外部 CLI 守护进程；纯 skill + `.hiq/` 文件协议。
+3. 不把 TDD 当默认仪式税；它是 `hiq-implement` 的风险控制工具，优先锁 public behavior。
+4. 不自动扩张新的工程 skill 名；`to-spec` / `to-tickets` / `tdd` 这类能力优先内化进 retained 11。
+5. 不把 wide refactor 当默认交付形态；先尝试 vertical slices，必要时才走例外。
+6. 不捆绑外部 CLI 守护进程；纯 skill + `.hiq/` 文件协议。
