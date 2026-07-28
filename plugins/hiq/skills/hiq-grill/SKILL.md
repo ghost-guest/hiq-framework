@@ -38,7 +38,9 @@ Planning is not question-asking theater.
 Verify local truth first.
 Synthesize the spec from what is already known.
 Ask only the highest-leverage user decision that the repo cannot answer.
+After the user answers, synthesize the plan automatically instead of asking them to request it again.
 No product coding starts until the contract is explicit enough to approve.
+Never shrink the requested outcome into MVP, prototype, first-version, or placeholder work unless the user explicitly approved that downgrade.
 ```
 
 ## Trigger signals
@@ -116,7 +118,9 @@ STATE triage:
 STATE frame_contract:
   define in `grill.md`:
     requested outcome
-    smallest worthwhile result
+    accepted complete result
+    scope fidelity / downgrade approval
+    staged delivery boundary when the user approved one
     non-goals
     constraints
     seam / behavior sketch
@@ -132,16 +136,25 @@ STATE decision_gate:
     ask exactly one highest-leverage decision question
     include recommendation + trade-off
     spend from the tier question budget
+    when the user answers, record the choice and continue into scope_fidelity_gate then plan_build automatically
   if the choice is purely engineering-owned:
     recommend and continue without asking
   if the budget is exhausted and planning is still dishonest:
     return Research First or Defer instead of interrogating further
+
+STATE scope_fidelity_gate:
+  compare the requested outcome, accepted complete result, non-goals, and proposed slices
+  if IMPLEMENT would say MVP / prototype / first-version / placeholder / later without explicit approval:
+    stop and ask one decision question about the downgrade or remove the downgrade
+  distinguish user-approved staging from unapproved quality or acceptance reduction
+  user-approved staging may narrow which object type ships first, but may not lower proof quality for that object
 
 STATE plan_build:
   produce or refresh `.hiq/changes/<id>/IMPLEMENT.md`
   include at minimum:
     Goal
     Acceptance
+    Scope fidelity / downgrade approval
     Current truth
     Spec / seam plan
     Expert review
@@ -192,7 +205,8 @@ Templates:
 
 `grill.md` and `IMPLEMENT.md` must preserve these in recoverable form:
 
-- the requested outcome and smallest worthwhile result
+- the requested outcome and accepted complete result
+- whether any MVP / prototype / first-version / placeholder / later-scope wording is explicitly approved or forbidden
 - confirmed facts vs still-open assumptions
 - the synthesized spec summary and chosen seam / behavior boundary
 - active experts and why they were relevant
@@ -213,6 +227,8 @@ Templates:
 7. Default to vertical end-to-end slices; use wide-refactor planning only when slices cannot stay green
 8. If acceptance is weak, the plan is not done even if the implementation idea feels obvious
 9. When scope or truth changes midstream, refresh the contract instead of freelancing in chat
+10. A user answer to a decision question must trigger plan synthesis or refresh; do not wait for the user to ask for the plan again
+11. Do not use MVP / prototype / first-version / placeholder wording unless the user explicitly approved that scope downgrade
 
 ## Announce
 
@@ -233,6 +249,8 @@ next: hiq-grill | hiq-implement | hiq-debug | hiq-evolve | hiq-session
 - No laundry-list planning dumps when one decisive question would do
 - No pretending a vague plan is “good enough” because review can catch it later
 - No stale chat memory standing in for `grill.md` or `IMPLEMENT.md`
+- No `IMPLEMENT.md` for L1+ product work without a preceding `grill.md`
+- No silent scope downgrade from the requested outcome to MVP / prototype / first-version / placeholder work
 
 ## Anti-patterns
 
@@ -242,6 +260,8 @@ next: hiq-grill | hiq-implement | hiq-debug | hiq-evolve | hiq-session
 4. Keep spending question budget on naming trivia while scope remains unclear
 5. Start coding because the likely plan seems obvious even though the contract is still fuzzy
 6. Hide plan drift inside implementation notes instead of reopening `hiq-grill`
+7. Ask a decision question, receive the answer, and then stop without producing or refreshing the implementation plan
+8. Rename the user's requested goal as an MVP when the user approved only staged delivery or temporary external stubs
 
 ## Done
 

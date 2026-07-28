@@ -99,6 +99,11 @@ STATE ensure_goal_record:
     choose hiq-grill as next owner
   if the work has no approved spec / seam / ticket frontier yet:
     choose hiq-grill as next owner
+  preserve scope fidelity:
+    the goal statement must keep the user's requested outcome intact
+    staged delivery is allowed only when the user approved the staging boundary
+    MVP / prototype / first-version / placeholder wording is a scope downgrade unless explicitly approved
+    record any approved downgrade or staging decision in the goal user-decision ledger
 
 STATE choose_owner:
   choose the single truthful retained owner step:
@@ -106,9 +111,10 @@ STATE choose_owner:
     missing baseline or stale project bootstrap -> hiq-init
     resume/status/checkpoint/pointer rebuild -> hiq-session
     unclear scope/acceptance/plan/spec/ticket frontier -> hiq-grill
+    unresolved user-owned inputs that affect acceptance -> hiq-grill or blocked
     approved implementation slice pending -> hiq-implement
     root cause unknown -> hiq-debug
-    materially done but proof missing -> hiq-review
+    materially done, no user-owned acceptance blocker remains, but proof missing -> hiq-review
     refactor/migrate/perf/harden/retire/system goal -> hiq-evolve
     durable ADR/lesson/casebook/audit capture needed -> hiq-knowledge
     framework/skill governance change needed -> hiq-skill
@@ -138,6 +144,7 @@ STATE loop:
     go back to choose_owner
   if the only blocker is a product/user decision:
     ask at most one focused decision question and wait
+    after the answer, route back to hiq-grill to synthesize or refresh the plan before implementation
   if the work is blocked by external reality:
     record the block honestly and stop
 
@@ -182,6 +189,9 @@ Templates:
 - Do not expand the retained owner count; `hiq-auto` is a wrapper, not owner #12
 - Do not ignore explicit user pause/stop/manual-lane instructions
 - Do not let the outer goal drift after acceptance or non-goals changed; route back to planning truth first
+- Do not silently downgrade a requested outcome into MVP, prototype, first-version, or placeholder work without an explicit user decision
+- Do not route to `hiq-review` while real API data, workbooks, credentials, environments, or other user-owned acceptance inputs are still pending
+- Do not treat a user answer as a plan; after a user-owned decision, refresh `grill.md` / `IMPLEMENT.md` before coding
 
 ## Announce
 
@@ -200,6 +210,7 @@ next: retained owner step | one user decision | checkpoint
 3. Auto-looping forever instead of stopping on a real external blocker or user-owned decision
 4. Letting `hiq-auto` silently widen scope beyond the stated goal and non-goals
 5. Adding auto mode without a durable goal record or session pointer
+6. Sending a partially scaffolded or fixture-only result to review while the real accepted outcome still depends on missing user input
 
 ## Done
 

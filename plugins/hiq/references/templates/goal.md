@@ -12,19 +12,23 @@
 ## 1. Requested outcome
 
 - user request:
-- smallest complete result:
+- accepted complete result:
+- staged delivery approved?: no | yes -> boundary:
+- scope downgrade approved?: no | yes -> exact approval source:
 
 ## 2. Goal statement
 
 - goal_now:
 - non-goals:
 - acceptance target:
+- anti-downgrade rule: MVP / prototype / first-version / placeholder requires explicit user approval
 
 ## 3. Current truthful bottleneck
 
 - why this owner is current:
 - evidence gap:
 - explicit blocker if any:
+- user-owned inputs still pending:
 - acceptance item still open:
 
 ## 4. Owner transition ledger

@@ -33,6 +33,7 @@ description: >-
 
 ```text
 Do not code past the approved contract.
+Do not code from a downgraded contract that replaces the user's goal with MVP, prototype, first-version, or placeholder work without explicit approval.
 One slice at a time.
 Take the next unblocked slice, not the most tempting slice.
 A slice is not done when code exists.
@@ -54,6 +55,7 @@ Use `hiq-implement` when one or more are true:
 ```text
 STATE classify:
   require approved IMPLEMENT.md unless this is an explicit L0 fast path
+  require `grill.md` before `IMPLEMENT.md` for L1+ product work
   detect mode:
     normal slice work -> execute
     risky logic / contract lock needed -> tdd
@@ -69,6 +71,7 @@ STATE load_contract:
   read IMPLEMENT in order:
     Goal
     Acceptance
+    Scope fidelity / downgrade approval
     Current truth
     Spec / seam plan
     Expert review
@@ -78,8 +81,10 @@ STATE load_contract:
     Verification
     Spec / CONTEXT to load before code
   load referenced `.hiq/spec/...` and relevant terms from `.hiq/CONTEXT.md`
-  if IMPLEMENT is stale, unapproved, or missing done-when clarity:
+  if IMPLEMENT is stale, unapproved, missing its L1+ grill source, or missing done-when clarity:
     route back to hiq-grill
+  if IMPLEMENT contains MVP / prototype / first-version / placeholder / later-scope language without explicit approval:
+    route back to hiq-grill before coding
 
 STATE choose_slice:
   select exactly one next unchecked slice on the current frontier unless the diff is truly one inseparable micro-change
@@ -91,7 +96,7 @@ STATE choose_slice:
     seam / public interface under test
     verify command
     done-when
-  if scope drift appears before code starts:
+  if scope drift or unapproved downgrade appears before code starts:
     stop and route to hiq-grill
 
 STATE map_and_preflight:
@@ -189,6 +194,9 @@ Template: `plugins/hiq/references/templates/IMPLEMENT.md`
 `IMPLEMENT.md` and execution state must keep these recoverable:
 
 - approved goal and acceptance
+- `grill.md` source for L1+ product work
+- scope fidelity / downgrade approval state
+- user-owned inputs that still affect acceptance
 - exact active frontier slice and next slice
 - touched files / allowed scope
 - spec and CONTEXT loaded before code
@@ -225,6 +233,8 @@ next: hiq-implement | hiq-review | hiq-debug | hiq-grill | hiq-session
 ## Gates
 
 - No coding without an approved contract except explicit L0 fast path
+- No L1+ product coding when `grill.md` is missing or stale relative to `IMPLEMENT.md`
+- No coding from contracts that silently downgrade the goal into MVP, prototype, first-version, or placeholder work
 - No multiple-slice drift hidden inside one “small” diff
 - No checkbox completion before fresh self-checks pass
 - No shared-risk edits without CodeGraph context
@@ -239,6 +249,7 @@ next: hiq-implement | hiq-review | hiq-debug | hiq-grill | hiq-session
 4. Use TDD performatively where no behavior lock is needed, or skip it where regressions are likely
 5. Delegate vague work and accept the result without contract/evidence checks
 6. Keep coding after acceptance or non-goals changed instead of routing back honestly
+7. Treat scaffold-only or fixture-only work as implementation-complete when the accepted result still depends on real external input
 
 ## Done
 

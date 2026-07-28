@@ -10,10 +10,20 @@
 - **default_mode**: execute | tdd | isolate | delegate
 - **ticket_strategy**: vertical-slices | wide-refactor-exception
 - **active_slice**: Slice N | none
-- **grill**: `grill.md`
+- **grill**: `grill.md` (required before L1+ product work)
+- **scope_downgrade_approved**: no | yes (message ref)
 - **verify baseline**: see §10
 
 ## 1. Goal (one sentence)
+
+## 1b. Scope fidelity / downgrade approval
+
+- requested outcome preserved?: no | yes
+- accepted complete result:
+- staged delivery approved?: no | yes -> boundary:
+- MVP / prototype / first-version / placeholder wording present?: no | yes -> approval source:
+- user-owned inputs still pending:
+- if pending inputs affect acceptance, route to: blocked | hiq-grill | scaffold-only follow-up
 
 ## 2. Non-goals
 
@@ -79,7 +89,7 @@ Or: N/A because ...
 - **When red-first TDD is required**:
 - **When isolation/worktree is required**:
 - **Delegation candidates and owned paths**:
-- **Stop and return to `hiq-grill` if**:
+- **Stop and return to `hiq-grill` if**: contract is missing `grill.md`, acceptance changes, or scope downgrade lacks explicit approval
 - **Stop and return to `hiq-debug` if**:
 
 ## 8b. Wide refactor exception (only if needed)

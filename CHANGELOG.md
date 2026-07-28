@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.23 — 2026-07-28
+
+- tightens HiQ goal fidelity after a real preset-data comparison session exposed MVP drift
+  - teaches `hiq-auto` to route unresolved acceptance-critical user inputs back to `hiq-grill` or blocked state instead of `hiq-review`
+  - makes `hiq-grill` synthesize or refresh the plan after a user decision answer and require explicit approval for MVP / prototype / first-version / placeholder downgrades
+  - makes `hiq-implement` reject L1+ product coding when `grill.md` is missing or the contract silently downgrades the requested outcome
+  - makes `hiq-review` block PASS when real user-owned inputs remain pending or the result is only an unapproved subset of the requested goal
+  - adds goal/grill/IMPLEMENT template fields and smoke assertions for scope fidelity, downgrade approval, and post-decision plan updates
+
 ## 0.8.22 — 2026-07-26
 
 - fixes Windows dispatcher argument forwarding so `hiq-run.cmd init-project <root>` no longer misreads the task token as the root path

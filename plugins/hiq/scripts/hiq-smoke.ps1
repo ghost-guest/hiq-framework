@@ -39,6 +39,15 @@ try {
   if ($sessionText -notmatch '- \*\*auto_owner\*\*: `hiq-session`') { Fail 'missing auto_owner in session.md' }
   if ($sessionText -notmatch '- \*\*goal_record\*\*:') { Fail 'missing goal_record in session.md' }
 
+  $goalTemplate = Get-Content -LiteralPath (Join-Path $repoRoot 'plugins\hiq\references\templates\goal.md') -Raw
+  if ($goalTemplate -notmatch 'accepted complete result') { Fail 'goal template missing accepted complete result field' }
+  $grillTemplate = Get-Content -LiteralPath (Join-Path $repoRoot 'plugins\hiq\references\templates\grill.md') -Raw
+  if ($grillTemplate -notmatch 'scope downgrade approved') { Fail 'grill template missing scope downgrade approval field' }
+  if ($grillTemplate -notmatch 'plan updated\?') { Fail 'grill template missing post-decision plan update field' }
+  $implementTemplate = Get-Content -LiteralPath (Join-Path $repoRoot 'plugins\hiq\references\templates\IMPLEMENT.md') -Raw
+  if ($implementTemplate -notmatch 'scope_downgrade_approved') { Fail 'IMPLEMENT template missing scope downgrade approval metadata' }
+  if ($implementTemplate -notmatch 'grill\.md` \(required before L1\+ product work\)') { Fail 'IMPLEMENT template missing grill-before-implement rule' }
+
   $statusOut = & (Join-Path $scriptDir 'hiq-status.ps1') $SmokeRoot | Out-String
   $doctorPre = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
   if ($statusOut -notmatch 'session=ok') { Fail 'status did not report session=ok after init-project' }

@@ -12,7 +12,9 @@
 ## 1. Problem frame
 
 - requested outcome:
-- smallest worthwhile result:
+- accepted complete result:
+- staged delivery approved?: no | yes -> boundary:
+- scope downgrade approved?: no | yes -> exact approval source:
 - non-goals:
 - constraints:
 
@@ -40,9 +42,9 @@
 
 ## 5. Decisions
 
-| id | question | experts | options | recommendation | status | choice |
-|----|----------|---------|---------|----------------|--------|--------|
-| D1 | | PM+ARCH | A / B | A because... | open \| chosen \| deferred | |
+| id | question | experts | options | recommendation | status | choice | plan updated? |
+|----|----------|---------|---------|----------------|--------|--------|---------------|
+| D1 | | PM+ARCH | A / B | A because... | open \| chosen \| deferred | | no \| yes |
 
 ## 6. Options / design pressure
 
@@ -52,12 +54,22 @@
 
 ## 7. Open blockers
 
+- user-owned inputs still pending:
+- acceptance impact:
+
 ## 8. Next question (at most one)
+
+## 8b. Scope fidelity gate
+
+- MVP / prototype / first-version / placeholder wording present?: no | yes -> approval source:
+- user-approved staging vs quality downgrade:
+- verdict: preserve goal | ask downgrade decision | remove downgrade
 
 ## 9. IMPLEMENT contract
 
 - goal:
 - acceptance:
+- scope fidelity / downgrade approval:
 - seams / public behaviors:
 - ticket frontier:
 - blocking edges:

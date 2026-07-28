@@ -36,6 +36,12 @@ grep -q -- '- \*\*entry_skill\*\*: `hiq-auto`' "$SMOKE_ROOT/.hiq/session.md" || 
 grep -q -- '- \*\*auto_owner\*\*: `hiq-session`' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing auto_owner in session.md'
 grep -q -- '- \*\*goal_record\*\*:' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing goal_record in session.md'
 
+grep -q 'accepted complete result' "$REPO_ROOT/plugins/hiq/references/templates/goal.md" || fail 'goal template missing accepted complete result field'
+grep -q 'scope downgrade approved' "$REPO_ROOT/plugins/hiq/references/templates/grill.md" || fail 'grill template missing scope downgrade approval field'
+grep -q 'plan updated?' "$REPO_ROOT/plugins/hiq/references/templates/grill.md" || fail 'grill template missing post-decision plan update field'
+grep -q 'scope_downgrade_approved' "$REPO_ROOT/plugins/hiq/references/templates/IMPLEMENT.md" || fail 'IMPLEMENT template missing scope downgrade approval metadata'
+grep -q 'grill.md` (required before L1+ product work)' "$REPO_ROOT/plugins/hiq/references/templates/IMPLEMENT.md" || fail 'IMPLEMENT template missing grill-before-implement rule'
+
 status_out="$(bash "$SCRIPT_DIR/hiq-status.sh" "$SMOKE_ROOT")"
 doctor_pre="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
 

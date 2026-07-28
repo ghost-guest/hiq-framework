@@ -37,6 +37,7 @@ description: >-
 Belief is not evidence.
 Green-looking code is not acceptance.
 A passing command or eval score only matters when it proves the required outcome for this revision.
+A scaffold, MVP, fixture, or placeholder result is blocked when the requested outcome still depends on real user-owned inputs.
 ```
 
 ## Trigger signals
@@ -84,6 +85,11 @@ STATE load_scope:
     blast radius worth protecting
   if approved contract is missing or stale:
     route to hiq-grill before judging readiness
+  if contract or artifacts use MVP / prototype / first-version / placeholder / later-scope language without explicit approval:
+    route to hiq-grill for scope fidelity before judging readiness
+  if real API data, workbooks, credentials, environments, screenshots, or other user-owned inputs are required for acceptance and still missing:
+    verdict is blocked or partial, not pass
+    next route is hiq-grill when the contract must change, otherwise blocked waiting for input
 
 STATE build_matrix:
   write the acceptance matrix in `review.md`
@@ -100,6 +106,7 @@ STATE findings_pass:
   inspect for:
     correctness
     contract drift
+    unapproved scope downgrade from the requested outcome
     security / trust-boundary mistakes
     regression risk
     hidden scope expansion
@@ -164,11 +171,13 @@ STATE verdict:
     Important = 0
     every required Acceptance item has matching fresh proof
     done-when claims for completed slices are satisfied
-    no material scope drift beyond non-goals
+    no material scope drift or unapproved downgrade beyond non-goals
+    no acceptance-critical user-owned input is still pending
     protected good paths are proven where needed
     evidence belongs to the current revision/worktree
     eval results, when used, do not contradict the release claim
   PARTIAL if some proof exists but the release bar is not met
+  BLOCKED if the remaining acceptance proof depends on user-owned external input that is not available yet
   FAIL if key acceptance proof is missing, a critical command is red, eval reveals an unaddressed required gap, or required findings remain
 
 STATE closeout:
@@ -211,6 +220,8 @@ Templates:
 `review.md` and `evidence.md` must preserve these in recoverable form:
 
 - review scope and approved contract source
+- scope fidelity / downgrade approval state
+- pending user-owned inputs and their acceptance impact
 - acceptance matrix with latest status per item
 - findings with severity, location, and current status
 - proof source for every release-relevant claim
@@ -248,6 +259,8 @@ next: hiq-review | hiq-implement | hiq-debug | hiq-grill | hiq-session
 - No `eval` result treated as a substitute for missing user-path proof
 - No “tests passed” shortcut when user-path proof is still missing
 - No closeout summary that hides open scope drift or unresolved findings
+- No PASS for MVP / prototype / first-version / placeholder work unless that downgrade was explicitly approved
+- No PASS while acceptance-critical user-owned inputs are still pending
 - No review state living only in chat while `review.md` is stale
 
 ## Anti-patterns
@@ -259,6 +272,7 @@ next: hiq-review | hiq-implement | hiq-debug | hiq-grill | hiq-session
 5. Write a warm release summary before naming the real gaps
 6. Keep proof work in `evidence.md` only, with no acceptance matrix or verdict record
 7. Run eval on the wrong task set and treat the number as authoritative anyway
+8. Review an MVP-shaped subset as done when the user asked for the complete accepted project outcome
 
 ## Done
 
