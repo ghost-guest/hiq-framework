@@ -9,4 +9,8 @@ Recommended event mapping:
 - after shell/tool mutation -> `post-tool --host=codex --adapter=codex --tool=<tool>`
 - before final response -> `pre-final --host=codex --adapter=codex`
 
+Skill discovery rule:
+
+- when the current agent is Codex, HiQ should only scan `~/.codex/skills/` for task-specific helper skills unless the user explicitly asks for cross-host inspection
+
 If Codex cannot guarantee automatic lifecycle invocation in the current environment, the project remains `turn-scoped` only after a hook command actually runs. It should not claim `persistent` from instructions alone.

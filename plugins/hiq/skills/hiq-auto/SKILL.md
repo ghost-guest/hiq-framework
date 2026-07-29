@@ -122,6 +122,17 @@ STATE choose_owner:
     durable ADR/lesson/casebook/audit capture needed -> hiq-knowledge
     framework/skill governance change needed -> hiq-skill
     otherwise -> hiq
+  after choosing the retained owner, scan only the current host's visible skill surface for a clearly better task-specific helper:
+    Claude session -> `~/.claude/skills/`
+    Codex session -> `~/.codex/skills/`
+    Pi session -> `~/.pi/agent/skills/`
+    LiveAgent session -> `~/.liveagent/skills/`
+    project-local lane -> `.agents/skills/`
+  do not fan out across every host at once; the current agent should only search its own skill root unless the user explicitly asks for cross-host inspection
+  if a non-HiQ skill is the best helper for the current owner step:
+    keep the retained owner truthful
+    record the helper as `manualOverride` / delegated helper, not as owner #12+
+    after that helper step finishes, return to hiq-auto and re-evaluate the truthful retained owner again
   lease the owner for the current real action; do not keep a prior aspirational owner
   append owner transition row into the goal ledger after the action completes
   write owner + reason + lease action into goal record and session pointer

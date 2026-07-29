@@ -11,6 +11,7 @@ This file is an instruction contract, not proof that a host hook executed. The c
 3. Enter goal mode for normal work:
    - create or refresh `.hiq/goals/<id>.md`
    - lease ownership to the truthful current owner skill before meaningful work
+   - if a non-HiQ host skill is the best helper for that owner step, keep the retained owner truthful and record the helper as a delegated manual override
    - append the owner transition after the step and refresh session/current-change/goal pointers
    - continue until `hiq-review` records current acceptance proof or a real blocker is recorded
 4. Do not record `hiq-review` as owner unless a review artifact or acceptance matrix is being produced or refreshed.
@@ -22,4 +23,5 @@ This file is an instruction contract, not proof that a host hook executed. The c
 ## Manual override
 
 - If the user explicitly asks for one retained skill for one turn, allow it.
+- If the truthful retained owner needs a task-specific helper, search only the current host's skill root unless the user explicitly asks for cross-host inspection.
 - After that turn, restore `hiq-auto` as the outer coordinator unless the user disabled auto mode.

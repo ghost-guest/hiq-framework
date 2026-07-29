@@ -18,7 +18,8 @@ if [[ "$OS" == "windows" ]]; then
 fi
 
 BIN_NAME="codegraph"
-HIQ_USER_BIN="${HIQ_BIN_DIR:-$HOME/.hiq/bin}"
+HIQ_HOME_BASE="${HIQ_HOME_DIR:-$HOME/.hiq}"
+HIQ_USER_BIN="${HIQ_BIN_DIR:-$HIQ_HOME_BASE/bin}"
 HIQ_PLUGIN_BIN="$HIQ_PLUGIN/bin"
 
 PINNED=""

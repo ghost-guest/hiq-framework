@@ -24,7 +24,7 @@ fail() {
 
 rm -rf "$SMOKE_ROOT" "$SMOKE_HOME"
 mkdir -p "$SMOKE_ROOT" "$SMOKE_HOME/scripts" "$SMOKE_HOME/bin"
-cp "$SCRIPT_DIR/hiq-run.sh" "$SCRIPT_DIR/hiq-status.sh" "$SCRIPT_DIR/hiq-doctor.sh" "$SCRIPT_DIR/hiq-hook.sh" "$SMOKE_HOME/scripts/"
+cp "$SCRIPT_DIR/hiq-run.sh" "$SCRIPT_DIR/hiq-status.sh" "$SCRIPT_DIR/hiq-doctor.sh" "$SCRIPT_DIR/hiq-hook.sh" "$SCRIPT_DIR/hiq-activate.sh" "$SMOKE_HOME/scripts/"
 chmod +x "$SMOKE_HOME/scripts"/*.sh
 export HIQ_HOME_DIR="$SMOKE_HOME"
 export HIQ_BIN_DIR="$SMOKE_HOME/bin"
@@ -87,6 +87,18 @@ doctor_post="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
 echo "$doctor_post" | grep -q 'runtime.codegraph_index=ok' || fail 'doctor should report codegraph index ok after project-init'
 echo "$doctor_post" | grep -q 'state.overall=ok' || fail 'doctor should report semantic state healthy after project-init'
 echo "$doctor_post" | grep -q 'overall=ok' || fail 'doctor should report overall=ok after project-init'
+grep -q '"hiq_status": "ok"' "$SMOKE_ROOT/.hiq/runtime-manifest.json" || fail 'runtime-manifest should record hiq_status=ok after project-init'
+grep -Eq '"hiq_doctor": "(ok|partial|error)"' "$SMOKE_ROOT/.hiq/runtime-manifest.json" || fail 'runtime-manifest should record a real hiq_doctor state after project-init'
+grep -q '"hiq_hook": "ok"' "$SMOKE_ROOT/.hiq/runtime-manifest.json" || fail 'runtime-manifest should record hiq_hook=ok after project-init'
+
+activate_out="$(bash "$SCRIPT_DIR/hiq-activate.sh" "$SMOKE_ROOT" --goal-title='Smoke activation goal' --goal-now='Smoke activation goal' --acceptance='Smoke activation acceptance' --owner=hiq-grill --phase=grill --next-skill=hiq-grill --next-step='Clarify and plan the next step' --reason='Smoke activation')"
+echo "$activate_out" | grep -q 'autoStatus=active' || fail 'hiq-activate should mark autoStatus=active'
+activated_status="$(bash "$SCRIPT_DIR/hiq-status.sh" "$SMOKE_ROOT")"
+echo "$activated_status" | grep -q 'auto_status=active' || fail 'status should report auto_status=active after activation'
+echo "$activated_status" | grep -q 'owner_skill=hiq-grill' || fail 'status should report owner_skill=hiq-grill after activation'
+find "$SMOKE_ROOT/.hiq/goals" -maxdepth 1 -name '*.md' | grep -q . || fail 'hiq-activate should create a goal record'
+doctor_activated="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
+echo "$doctor_activated" | grep -q 'state.overall=ok' || fail 'doctor should keep semantic state healthy after activation'
 
 python3 - <<PY
 import json

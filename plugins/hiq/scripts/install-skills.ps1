@@ -17,16 +17,21 @@ $src = Join-Path $hiqHome 'skills'
 $ref = Join-Path $hiqHome 'references'
 $scripts = Join-Path $hiqHome 'scripts'
 $vendor = Join-Path $hiqHome 'vendor'
+$extensions = Join-Path $hiqHome 'extensions'
 
 $liveagentSkills = if ($env:LIVEAGENT_SKILLS) { $env:LIVEAGENT_SKILLS } else { Join-Path $env:USERPROFILE '.liveagent\skills' }
 $codexSkills = if ($env:CODEX_SKILLS) { $env:CODEX_SKILLS } else { Join-Path $env:USERPROFILE '.codex\skills' }
 $claudeSkills = if ($env:CLAUDE_SKILLS) { $env:CLAUDE_SKILLS } else { Join-Path $env:USERPROFILE '.claude\skills' }
+$piSkills = if ($env:PI_SKILLS) { $env:PI_SKILLS } else { Join-Path $env:USERPROFILE '.pi\agent\skills' }
+$piExtensions = if ($env:PI_EXTENSIONS) { $env:PI_EXTENSIONS } else { Join-Path $env:USERPROFILE '.pi\agent\extensions' }
+$claudeHooks = if ($env:CLAUDE_HOOKS) { $env:CLAUDE_HOOKS } else { Join-Path $env:USERPROFILE '.claude\hooks' }
 $hiqUserHome = if ($env:HIQ_HOME_DIR) { $env:HIQ_HOME_DIR } else { Join-Path $env:USERPROFILE '.hiq' }
 
 switch ($Target.ToLower()) {
   'liveagent' { $dest = $liveagentSkills }
   'codex' { $dest = $codexSkills }
   'claude' { $dest = $claudeSkills }
+  'pi' { $dest = $piSkills }
   'project' {
     if (-not $ProjectDir) { throw 'project target needs PROJECT_DIR as arg2' }
     $dest = Join-Path $ProjectDir '.agents\skills'
@@ -52,7 +57,13 @@ foreach ($dir in $skillDirs) {
 
 if ($Apply -ne 1) {
   Write-Output "mode=preview count=$count"
-  Write-Output "note=apply=1 also installs Cleboost/codegraph-rs plus hiq-status/hiq-doctor/hiq-hook into ~/.hiq/scripts and host helper copies"
+  Write-Output "note=apply=1 also installs Cleboost/codegraph-rs plus hiq-status/hiq-doctor/hiq-hook/hiq-activate into ~/.hiq/scripts and host helper copies"
+  if ($Target.ToLower() -eq 'pi' -and (Test-Path -LiteralPath (Join-Path $extensions 'pi-hiq-auto-hook'))) {
+    Write-Output 'note=pi target also installs ~/.pi/agent/extensions/hiq-auto-hook'
+  }
+  if ($Target.ToLower() -eq 'claude' -and (Test-Path -LiteralPath (Join-Path $extensions 'claude-hiq-auto-hook'))) {
+    Write-Output 'note=claude target also installs ~/.claude/hooks/hiq-auto and merges hooks.json'
+  }
   exit 0
 }
 
@@ -98,6 +109,40 @@ foreach ($name in @('_hiq-scripts', '_hiq-vendor')) {
 Copy-Item -LiteralPath $scripts -Destination (Join-Path $dest '_hiq-scripts') -Recurse -Force
 Copy-Item -LiteralPath $vendor -Destination (Join-Path $dest '_hiq-vendor') -Recurse -Force
 Write-Output 'installed=_hiq-scripts _hiq-vendor'
+
+if ($Target.ToLower() -eq 'pi') {
+  $piHookSource = Join-Path $extensions 'pi-hiq-auto-hook'
+  if (Test-Path -LiteralPath $piHookSource) {
+    New-Item -ItemType Directory -Path $piExtensions -Force | Out-Null
+    $piHookDest = Join-Path $piExtensions 'hiq-auto-hook'
+    if (Test-Path -LiteralPath $piHookDest) {
+      $extBackupRoot = Join-Path $piExtensions ".hiq-backup-$stamp"
+      New-Item -ItemType Directory -Path $extBackupRoot -Force | Out-Null
+      Move-Item -LiteralPath $piHookDest -Destination (Join-Path $extBackupRoot 'hiq-auto-hook') -Force
+      Write-Output 'backup=hiq-auto-hook'
+    }
+    Copy-Item -LiteralPath $piHookSource -Destination $piHookDest -Recurse -Force
+    Write-Output "installed=$piHookDest"
+  }
+}
+
+if ($Target.ToLower() -eq 'claude') {
+  $claudeHookSource = Join-Path $extensions 'claude-hiq-auto-hook'
+  if (Test-Path -LiteralPath $claudeHookSource) {
+    New-Item -ItemType Directory -Path $claudeHooks -Force | Out-Null
+    $claudeHookDest = Join-Path $claudeHooks 'hiq-auto'
+    if (Test-Path -LiteralPath $claudeHookDest) {
+      $claudeBackupRoot = Join-Path $claudeHooks ".hiq-backup-$stamp"
+      New-Item -ItemType Directory -Path $claudeBackupRoot -Force | Out-Null
+      Move-Item -LiteralPath $claudeHookDest -Destination (Join-Path $claudeBackupRoot 'hiq-auto') -Force
+      Write-Output 'backup=claude-hiq-auto'
+    }
+    Copy-Item -LiteralPath $claudeHookSource -Destination $claudeHookDest -Recurse -Force
+    Write-Output "installed=$claudeHookDest"
+    & (Join-Path $scripts 'lib\merge_claude_hooks.ps1') -HooksJson (Join-Path $claudeHooks 'hooks.json') -HookRoot $claudeHookDest -Platform windows
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+  }
+}
 
 Write-Output 'hiq-install: installing bundled codegraph-rs...'
 & (Join-Path $scripts 'install-codegraph.cmd')

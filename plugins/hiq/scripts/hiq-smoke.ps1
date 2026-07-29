@@ -30,6 +30,8 @@ Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-run.cmd') -Destination (Join-P
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-status.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-doctor.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-hook.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
+Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-activate.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
+Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-activate.ps1') -Destination (Join-Path $smokeHome 'scripts') -Force
 $env:HIQ_HOME_DIR = $smokeHome
 $env:HIQ_BIN_DIR = Join-Path $smokeHome 'bin'
 
@@ -109,6 +111,19 @@ try {
   if ($doctorPost -notmatch 'runtime.codegraph_index=ok') { Fail 'doctor should report codegraph index ok after project-init' }
   if ($doctorPost -notmatch 'state.overall=ok') { Fail 'doctor should report semantic state healthy after project-init' }
   if ($doctorPost -notmatch 'overall=ok') { Fail 'doctor should report overall=ok after project-init' }
+  $manifestText = Get-Content -LiteralPath (Join-Path $SmokeRoot '.hiq\runtime-manifest.json') -Raw
+  if ($manifestText -notmatch '"hiq_status"\s*:\s*"ok"') { Fail 'runtime-manifest should record hiq_status=ok after project-init' }
+  if ($manifestText -notmatch '"hiq_doctor"\s*:\s*"(ok|partial|error)"') { Fail 'runtime-manifest should record a real hiq_doctor state after project-init' }
+  if ($manifestText -notmatch '"hiq_hook"\s*:\s*"ok"') { Fail 'runtime-manifest should record hiq_hook=ok after project-init' }
+
+  $activateOut = & (Join-Path $scriptDir 'hiq-activate.ps1') $SmokeRoot -GoalTitle 'Smoke activation goal' -GoalNow 'Smoke activation goal' -Acceptance 'Smoke activation acceptance' -Owner 'hiq-grill' -Phase 'grill' -NextSkill 'hiq-grill' -NextStep 'Clarify and plan the next step' -Reason 'Smoke activation' | Out-String
+  if ($activateOut -notmatch 'autoStatus=active') { Fail 'hiq-activate should mark autoStatus=active' }
+  $activatedStatus = & (Join-Path $scriptDir 'hiq-status.ps1') $SmokeRoot | Out-String
+  if ($activatedStatus -notmatch 'auto_status=active') { Fail 'status should report auto_status=active after activation' }
+  if ($activatedStatus -notmatch 'owner_skill=hiq-grill') { Fail 'status should report owner_skill=hiq-grill after activation' }
+  if (-not (Get-ChildItem -LiteralPath (Join-Path $SmokeRoot '.hiq\goals') -Filter '*.md' -ErrorAction SilentlyContinue)) { Fail 'hiq-activate should create a goal record' }
+  $doctorActivated = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
+  if ($doctorActivated -notmatch 'state.overall=ok') { Fail 'doctor should keep semantic state healthy after activation' }
 
   $currentPath = Join-Path $SmokeRoot '.hiq\current-change.json'
   $sessionPath = Join-Path $SmokeRoot '.hiq\session.md'

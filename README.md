@@ -122,6 +122,10 @@ bash "$HOME/.hiq/scripts/hiq-hook.sh" . pre-session --host=generic --adapter=gen
 
 The hook core is generic. Claude, Codex, Pi, LiveAgent, and other hosts are adapters that call the same protocol; no single host is the default automation model.
 
+For Pi, install with `bash plugins/hiq/scripts/install-skills.sh pi`. That target now syncs HiQ skills into `~/.pi/agent/skills/`, runtime scripts into `~/.hiq/scripts/`, and a Pi extension scaffold into `~/.pi/agent/extensions/hiq-auto-hook/`.
+
+For Claude, install with `bash plugins/hiq/scripts/install-skills.sh claude`. That target now syncs HiQ skills into `~/.claude/skills/`, installs a Claude hook bundle into `~/.claude/hooks/hiq-auto/`, and merges HiQ entries into `~/.claude/hooks/hooks.json`.
+
 ## Typical Flow | 典型流程
 
 ```text

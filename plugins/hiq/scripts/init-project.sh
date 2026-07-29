@@ -519,6 +519,12 @@ if [[ ! -f "$HIQ/runtime-manifest.json" ]]; then
     "config": ".hiq/config.yaml",
     "current_change": ".hiq/current-change.json",
     "eval_root": ".hiq/eval"
+  },
+  "runtime_state": {
+    "hiq_status": "missing",
+    "hiq_doctor": "missing",
+    "hiq_hook": "missing",
+    "updated_at": "$STAMP"
   }
 }
 EOF
@@ -540,6 +546,7 @@ This file is an instruction contract, not proof that a host hook executed. The c
 3. Enter goal mode for normal work:
    - create or refresh \`.hiq/goals/<id>.md\`
    - lease ownership to the truthful current owner skill before meaningful work
+   - if a non-HiQ host skill is the best helper for that owner step, keep the retained owner truthful and record the helper as a delegated manual override
    - append the owner transition after the step and refresh session/current-change/goal pointers
    - continue until \`hiq-review\` records current acceptance proof or a real blocker is recorded
 4. Do not record \`hiq-review\` as owner unless a review artifact or acceptance matrix is being produced or refreshed.
@@ -547,6 +554,7 @@ This file is an instruction contract, not proof that a host hook executed. The c
 6. Ask the user only for genuine decisions that local truth cannot answer.
 7. If context pressure rises or a handoff is required, write a checkpoint first and mirror its path in session/current-change/goal state.
 8. Keep durable verification commands current; mark stale or unrunnable commands instead of preserving deleted paths.
+9. If the truthful retained owner needs a task-specific helper, search only the current host's skill root unless the user explicitly asks for cross-host inspection.
 "
 
 if { ! grep -q '^# HiQ Project Rule' "$ROOT/AGENTS.md" 2>/dev/null || ! grep -q 'hiq-auto' "$ROOT/AGENTS.md" 2>/dev/null; } && [[ "$CURRENT_PREEXISTED" == false && "$SESSION_PREEXISTED" == false ]]; then
