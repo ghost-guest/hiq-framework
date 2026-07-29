@@ -110,7 +110,17 @@ $hiq-auto
 # 规则驱动的 goal 循环 -> 租约式记录真实 owner -> 一直推进到验收达标
 ```
 
-`AGENTS.md` and `auto.enabled` request this coordination layer; they do not prove that a host hook executed. Fresh projects report `hostAutomationLevel=instruction-only` and `autoStatus=available` until a host provides verifiable stronger evidence. Inspect the truth with `hiq-status`, and use `hiq-doctor --strict` when CI or release checks must block on state drift.
+`AGENTS.md` and `auto.enabled` request this coordination layer; they do not prove that a host hook executed. Fresh projects report `hostAutomationLevel=instruction-only` and `autoStatus=available` until a host-neutral `hiq-hook` run leaves evidence under `.hiq/hooks/runs/` or a stronger adapter proves persistent host enforcement. Inspect the truth with `hiq-status`, and use `hiq-doctor --strict` when CI or release checks must block on state drift.
+
+Hook core:
+
+```bash
+bash "$HOME/.hiq/scripts/hiq-hook.sh" . pre-session --host=generic --adapter=generic
+# Windows
+%USERPROFILE%\.hiq\scripts\hiq-hook.cmd . pre-session --host=generic --adapter=generic
+```
+
+The hook core is generic. Claude, Codex, Pi, LiveAgent, and other hosts are adapters that call the same protocol; no single host is the default automation model.
 
 ## Typical Flow | 典型流程
 

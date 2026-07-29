@@ -12,3 +12,5 @@ context-checkpoints/
 .hiq/runtime-manifest.json
 .hiq/changes/
 .hiq/eval/runs/
+.hiq/hooks/hook-state.json
+.hiq/hooks/runs/

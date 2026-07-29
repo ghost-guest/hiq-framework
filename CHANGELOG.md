@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.8.25 — 2026-07-29
+
+- adds a host-neutral HiQ hook core instead of binding automation to one agent host
+  - introduces cross-platform `hiq-hook.sh` / `hiq-hook.ps1` / `hiq-hook.cmd` and dispatcher support through `hiq-run ... hook`
+  - adds `.hiq/hooks/` templates, hook run evidence under `.hiq/hooks/runs/`, and host adapter references for generic, Claude, Codex, Pi, and LiveAgent wiring
+  - extends schema 2 state with hook protocol, adapter, last-run, and evidence fields while preserving honest fresh init as `instruction-only`
+  - teaches POSIX and Windows `hiq-status` / `hiq-doctor` to report and validate hook evidence before claiming `turn-scoped` or `persistent` automation
+  - expands smoke coverage so a real hook run promotes state to `turn-scoped` only when verifiable run evidence exists
+
 ## 0.8.24 — 2026-07-29
 
 - closes the HiQ runtime/state truth gap exposed by a real project session

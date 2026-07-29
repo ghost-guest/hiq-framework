@@ -52,7 +52,8 @@ HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划�
 - 它是外层协调入口，负责 goal 驱动、连续选择当前真实 owner、持续推进到验收或诚实阻塞
 - 默认 owner 仍然只来自 retained 11，并以 owner lease 记录当前真实动作
 - `hiq-review` 仍然是唯一 completion / acceptance proof owner
-- `AGENTS.md` 是 instruction contract，不是宿主 hook 证明；宿主能力必须由 `hostAutomationLevel` 与 evidence 记录
+- `AGENTS.md` 是 instruction contract，不是宿主 hook 证明；宿主能力必须由 `hostAutomationLevel` 与 `.hiq/hooks/runs/` evidence 记录
+- `hiq-hook` 是通用 hook core；Claude、Codex、Pi、LiveAgent 等都只是 adapter，不得固定为唯一宿主模型
 
 ## 4. 风险分级
 

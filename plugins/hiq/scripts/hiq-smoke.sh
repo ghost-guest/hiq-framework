@@ -24,7 +24,7 @@ fail() {
 
 rm -rf "$SMOKE_ROOT" "$SMOKE_HOME"
 mkdir -p "$SMOKE_ROOT" "$SMOKE_HOME/scripts" "$SMOKE_HOME/bin"
-cp "$SCRIPT_DIR/hiq-run.sh" "$SCRIPT_DIR/hiq-status.sh" "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_HOME/scripts/"
+cp "$SCRIPT_DIR/hiq-run.sh" "$SCRIPT_DIR/hiq-status.sh" "$SCRIPT_DIR/hiq-doctor.sh" "$SCRIPT_DIR/hiq-hook.sh" "$SMOKE_HOME/scripts/"
 chmod +x "$SMOKE_HOME/scripts"/*.sh
 export HIQ_HOME_DIR="$SMOKE_HOME"
 export HIQ_BIN_DIR="$SMOKE_HOME/bin"
@@ -35,6 +35,8 @@ bash "$SCRIPT_DIR/init-project.sh" "$SMOKE_ROOT" >/dev/null
 grep -q 'schema: 2' "$SMOKE_ROOT/.hiq/config.yaml" || fail 'config did not use schema 2'
 grep -q 'host_automation_level.*instruction-only' "$SMOKE_ROOT/.hiq/session.md" || fail 'missing honest host automation level'
 grep -q '"hostAutomationLevel": "instruction-only"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing hostAutomationLevel in current-change.json'
+grep -q '"hookCoreStatus": "available"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing hookCoreStatus in current-change.json'
+grep -q '"hookAdapter": "none"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'fresh init must not pin a host adapter'
 grep -q '"autoStatus": "available"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'fresh init must report autoStatus=available'
 grep -q '"entrySkill": "hiq-auto"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing entrySkill in current-change.json'
 grep -q '"autoOwnerSkill": "hiq-session"' "$SMOKE_ROOT/.hiq/current-change.json" || fail 'missing autoOwnerSkill in current-change.json'
@@ -57,12 +59,26 @@ doctor_pre="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
 echo "$status_out" | grep -q 'session=ok' || fail 'status did not report session=ok after init-project'
 echo "$status_out" | grep -q 'entry_skill=hiq-auto' || fail 'status should report entry_skill=hiq-auto after init-project'
 echo "$status_out" | grep -q 'host_automation_level=instruction-only' || fail 'status should report instruction-only host automation'
+echo "$status_out" | grep -q 'hook_core_status=available' || fail 'status should report available hook core'
+echo "$status_out" | grep -q 'hook_adapter=none' || fail 'status should report no pinned host adapter on fresh init'
 echo "$status_out" | grep -q 'auto_status=available' || fail 'status should report autoStatus=available before a real turn enters'
 echo "$status_out" | grep -q 'auto_owner=hiq-session' || fail 'status should report auto_owner=hiq-session after init-project'
 echo "$status_out" | grep -q 'pointer_status=ok' || fail 'status should report an aligned fresh pointer'
 echo "$doctor_pre" | grep -q 'runtime.codegraph_index=missing' || fail 'doctor should report missing codegraph index before project-init'
+echo "$doctor_pre" | grep -q 'runtime.hiq_hook=ok' || fail 'doctor should report available hook core runtime script'
+echo "$doctor_pre" | grep -q 'state.hook=ok' || fail 'doctor should report hook state healthy after init-project'
 echo "$doctor_pre" | grep -q 'state.overall=ok' || fail 'doctor should report semantic state healthy after init-project'
 echo "$doctor_pre" | grep -q 'overall=partial' || fail 'doctor should report overall=partial before project-init'
+
+hook_out="$(bash "$SCRIPT_DIR/hiq-hook.sh" "$SMOKE_ROOT" pre-session --host=generic --adapter=generic)"
+echo "$hook_out" | grep -q 'hook.status=pass' || fail 'hook core did not report pass'
+hook_status="$(bash "$SCRIPT_DIR/hiq-status.sh" "$SMOKE_ROOT")"
+echo "$hook_status" | grep -q 'host_automation_level=turn-scoped' || fail 'hook run should promote host automation to turn-scoped'
+echo "$hook_status" | grep -q 'hook_adapter=generic' || fail 'hook run should record generic adapter'
+echo "$hook_status" | grep -q 'hook_last_event=pre-session' || fail 'hook run should record last event'
+doctor_hook="$(bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT")"
+echo "$doctor_hook" | grep -q 'state.hook=ok' || fail 'doctor should accept hook run evidence'
+echo "$doctor_hook" | grep -q 'state.overall=ok' || fail 'doctor should keep semantic state healthy after hook run'
 
 echo "hiq-smoke: project-init root=$SMOKE_ROOT"
 bash "$SCRIPT_DIR/codegraph-project-init.sh" "$SMOKE_ROOT" >/dev/null
@@ -81,7 +97,7 @@ path.write_text(json.dumps(data, separators=(',', ':')))
 PY
 compact_status="$(bash "$SCRIPT_DIR/hiq-status.sh" "$SMOKE_ROOT")"
 echo "$compact_status" | grep -q 'entry_skill=hiq-auto' || fail 'status could not read compact current-change.json'
-echo "$compact_status" | grep -q 'host_automation_level=instruction-only' || fail 'status could not read compact hostAutomationLevel'
+echo "$compact_status" | grep -q 'host_automation_level=turn-scoped' || fail 'status could not read compact hostAutomationLevel'
 python3 - <<PY
 import json
 from pathlib import Path
@@ -98,17 +114,30 @@ cp "$SESSION_FILE" "$SESSION_FILE.bak"
 sed -i.bak 's/"ownerSkill": "hiq-session"/"ownerSkill": "hiq-implement"/' "$CURRENT_FILE"
 if bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT" --strict >/dev/null 2>&1; then fail 'strict doctor accepted owner/phase drift'; fi
 mv "$CURRENT_FILE.bak" "$CURRENT_FILE"
+cp "$CURRENT_FILE" "$CURRENT_FILE.bak"
 
-sed -i.bak 's/"hostAutomationEvidence": "AGENTS.md"/"hostAutomationEvidence": "missing-agents.md"/' "$CURRENT_FILE"
-sed -i.bak 's/- \*\*host_automation_evidence\*\*: `AGENTS.md`/- **host_automation_evidence**: missing-agents.md/' "$SESSION_FILE"
+python3 - "$CURRENT_FILE" "$SESSION_FILE" <<'PY'
+import json, re, sys
+from pathlib import Path
+current = Path(sys.argv[1])
+session = Path(sys.argv[2])
+data = json.loads(current.read_text())
+data['hostAutomationEvidence'] = '.hiq/hooks/runs/missing-hook.json'
+current.write_text(json.dumps(data, indent=2) + '\n')
+text = session.read_text()
+text = re.sub(r'^- \*\*host_automation_evidence\*\*:.*$', '- **host_automation_evidence**: `.hiq/hooks/runs/missing-hook.json`', text, flags=re.M)
+session.write_text(text)
+PY
 if bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT" --strict >/dev/null 2>&1; then fail 'strict doctor accepted missing host automation evidence'; fi
 mv "$CURRENT_FILE.bak" "$CURRENT_FILE"
 mv "$SESSION_FILE.bak" "$SESSION_FILE"
+cp "$CURRENT_FILE" "$CURRENT_FILE.bak"
 cp "$SESSION_FILE" "$SESSION_FILE.bak"
 
 sed -i.bak 's/"stateStatus": "idle"/"stateStatus": "accepted"/; s/"autoStatus": "available"/"autoStatus": "accepted"/; s/"reviewStatus": "not-run"/"reviewStatus": "pass"/' "$CURRENT_FILE"
 if bash "$SCRIPT_DIR/hiq-doctor.sh" "$SMOKE_ROOT" --strict >/dev/null 2>&1; then fail 'strict doctor accepted missing review proof'; fi
 mv "$CURRENT_FILE.bak" "$CURRENT_FILE"
+cp "$CURRENT_FILE" "$CURRENT_FILE.bak"
 
 sed -i.bak 's/"verifyStatus": "unset"/"verifyStatus": "valid"/' "$CURRENT_FILE"
 sed -i.bak 's/- \*\*verify_status\*\*: unset/- **verify_status**: valid/; s/- \*\*verify_commands\*\*:$/- **verify_commands**: `python3 --object config\/objects\/deleted.json`/' "$SESSION_FILE"

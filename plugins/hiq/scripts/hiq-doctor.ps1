@@ -92,7 +92,7 @@ function Compare-State([string]$Category, [string]$Code, [string]$Left, [string]
 }
 
 $script:State = [ordered]@{
-  json = 'ok'; schema = 'ok'; reconciliation = 'ok'; owner = 'ok'; review = 'ok'; eval = 'ok'; checkpoint = 'ok'; verify = 'ok'
+  json = 'ok'; schema = 'ok'; reconciliation = 'ok'; owner = 'ok'; review = 'ok'; eval = 'ok'; checkpoint = 'ok'; verify = 'ok'; hook = 'ok'
 }
 $script:Issues = [System.Collections.Generic.List[object]]::new()
 $script:IssueCount = 0
@@ -136,7 +136,8 @@ $codegraphIndex = Check-Dir (Join-Path $ResolvedRoot ".codegraph")
 $globalScriptsStatus = Check-File (Join-Path $hiqHome "scripts\hiq-run.cmd")
 $globalStatusStatus = Check-File (Join-Path $hiqHome "scripts\hiq-status.cmd")
 $globalDoctorStatus = Check-File (Join-Path $hiqHome "scripts\hiq-doctor.cmd")
-$runtimeOk = ($codegraphStatus -eq 'ok' -and $codegraphIndex -eq 'ok' -and $globalScriptsStatus -eq 'ok' -and $globalStatusStatus -eq 'ok' -and $globalDoctorStatus -eq 'ok')
+$globalHookStatus = Check-File (Join-Path $hiqHome "scripts\hiq-hook.cmd")
+$runtimeOk = ($codegraphStatus -eq 'ok' -and $codegraphIndex -eq 'ok' -and $globalScriptsStatus -eq 'ok' -and $globalStatusStatus -eq 'ok' -and $globalDoctorStatus -eq 'ok' -and $globalHookStatus -eq 'ok')
 
 $currentObj = $null
 if (-not (Test-Path -LiteralPath $current -PathType Leaf)) {
@@ -153,7 +154,7 @@ $framework = Get-JsonValue $currentObj 'framework'
 $schema = Get-JsonValue $currentObj 'schema'
 if ($framework -ne 'hiq') { Add-Issue schema state.framework_invalid 'framework must be hiq' }
 if ($schema -ne '2') { Add-Issue schema state.schema_legacy "schema=$schema; run hiq-init refresh to add schema 2 fields" }
-$requiredKeys = @('stateRevision','changeId','stateStatus','contentRevision','entrySkill','entryMode','hostTarget','hostAutomationLevel','hostAutomationEvidence','autoStatus','autoOwnerSkill','autoReason','manualOverride','activeChange','phase','ownerSkill','nextSkill','nextStep','goalId','goalPath','goalNow','acceptanceTarget','reviewStatus','reviewPath','reviewedContentRevision','acceptedAt','evalApplicability','evalStatus','evalRunPath','evalReason','checkpointRequired','checkpointReason','resumeSource','latestCheckpoint','verifyCommandsSource','verifyCwd','verifyStatus','verifyWaiverReason','updatedAt')
+$requiredKeys = @('stateRevision','changeId','stateStatus','contentRevision','entrySkill','entryMode','hostTarget','hostAutomationLevel','hostAutomationEvidence','hookProtocolVersion','hookCoreStatus','hookAdapter','hookLastEvent','hookLastRunPath','hookLastRunAt','hookLastRunStatus','autoStatus','autoOwnerSkill','autoReason','manualOverride','activeChange','phase','ownerSkill','nextSkill','nextStep','goalId','goalPath','goalNow','acceptanceTarget','reviewStatus','reviewPath','reviewedContentRevision','acceptedAt','evalApplicability','evalStatus','evalRunPath','evalReason','checkpointRequired','checkpointReason','resumeSource','latestCheckpoint','verifyCommandsSource','verifyCwd','verifyStatus','verifyWaiverReason','updatedAt')
 foreach ($key in $requiredKeys) {
   if ($null -eq $currentObj -or $null -eq $currentObj.PSObject.Properties[$key]) { Add-Issue schema "state.field_missing.$key" "$key is missing" }
 }
@@ -167,6 +168,13 @@ $entryMode = Get-JsonValue $currentObj 'entryMode'
 $hostTarget = Get-JsonValue $currentObj 'hostTarget'
 $hostLevel = Get-JsonValue $currentObj 'hostAutomationLevel'
 $hostEvidence = Get-JsonValue $currentObj 'hostAutomationEvidence'
+$hookProtocol = Get-JsonValue $currentObj 'hookProtocolVersion'
+$hookCore = Get-JsonValue $currentObj 'hookCoreStatus'
+$hookAdapter = Get-JsonValue $currentObj 'hookAdapter'
+$hookLastEvent = Get-JsonValue $currentObj 'hookLastEvent'
+$hookLastRun = Get-JsonValue $currentObj 'hookLastRunPath'
+$hookLastRunAt = Get-JsonValue $currentObj 'hookLastRunAt'
+$hookLastStatus = Get-JsonValue $currentObj 'hookLastRunStatus'
 $autoStatus = Get-JsonValue $currentObj 'autoStatus'
 $autoOwner = Get-JsonValue $currentObj 'autoOwnerSkill'
 $manualOverride = Get-JsonValue $currentObj 'manualOverride'
@@ -197,7 +205,10 @@ $verifyStatus = Get-JsonValue $currentObj 'verifyStatus'
 $verifyWaiver = Get-JsonValue $currentObj 'verifyWaiverReason'
 
 if ($stateStatus -notin @('idle','active','blocked','handoff','accepted')) { Add-Issue schema state.status_invalid "stateStatus=$stateStatus" }
-if ($hostLevel -notin @('unavailable','instruction-only','turn-scoped','persistent')) { Add-Issue schema state.host_level_invalid "hostAutomationLevel=$hostLevel" }
+if ($hostLevel -notin @('unavailable','instruction-only','adapter-available','turn-scoped','persistent')) { Add-Issue schema state.host_level_invalid "hostAutomationLevel=$hostLevel" }
+if ($hookCore -notin @('missing','available','running','failed')) { Add-Issue hook state.hook_core_invalid "hookCoreStatus=$hookCore" }
+if ($hookLastEvent -notin @('','none','null','pre-session','pre-tool','post-tool','pre-final','checkpoint','status')) { Add-Issue hook state.hook_event_invalid "hookLastEvent=$hookLastEvent" }
+if ($hookLastStatus -notin @('none','pass','fail')) { Add-Issue hook state.hook_status_invalid "hookLastRunStatus=$hookLastStatus" }
 if ($autoStatus -notin @('available','active','manual','disabled','blocked','accepted','handoff')) { Add-Issue schema state.auto_status_invalid "autoStatus=$autoStatus" }
 if ($reviewStatus -notin @('not-run','pending','pass','partial','fail','blocked')) { Add-Issue schema state.review_status_invalid "reviewStatus=$reviewStatus" }
 if ($evalApplicability -notin @('unknown','not-applicable','optional','required')) { Add-Issue schema state.eval_applicability_invalid "evalApplicability=$evalApplicability" }
@@ -215,6 +226,12 @@ Compare-State reconciliation state.entry_mode_mismatch $entryMode (Get-MdField '
 Compare-State reconciliation state.host_target_mismatch $hostTarget (Get-MdField 'host_target' $session)
 Compare-State reconciliation state.host_level_mismatch $hostLevel (Get-MdField 'host_automation_level' $session)
 Compare-State reconciliation state.host_evidence_mismatch $hostEvidence (Get-MdField 'host_automation_evidence' $session)
+Compare-State reconciliation state.hook_protocol_mismatch $hookProtocol (Get-MdField 'hook_protocol_version' $session)
+Compare-State reconciliation state.hook_core_mismatch $hookCore (Get-MdField 'hook_core_status' $session)
+Compare-State reconciliation state.hook_adapter_mismatch $hookAdapter (Get-MdField 'hook_adapter' $session)
+Compare-State reconciliation state.hook_event_mismatch $hookLastEvent (Get-MdField 'hook_last_event' $session)
+Compare-State reconciliation state.hook_run_mismatch $hookLastRun (Get-MdField 'hook_last_run' $session)
+Compare-State reconciliation state.hook_status_mismatch $hookLastStatus (Get-MdField 'hook_last_status' $session)
 Compare-State reconciliation state.auto_status_mismatch $autoStatus (Get-MdField 'auto_status' $session)
 Compare-State reconciliation state.auto_owner_mismatch $autoOwner (Get-MdField 'auto_owner' $session)
 Compare-State reconciliation state.manual_override_mismatch $manualOverride (Get-MdField 'manual_override' $session)
@@ -269,6 +286,23 @@ if ($hostLevel -in @('turn-scoped','persistent')) {
     $hostText = Get-Content -LiteralPath (Resolve-Project $hostEvidence) -Raw
     if ($hostText -notmatch '(?m)^# HiQ Project Rule' -or $hostText -notmatch 'hiq-auto') { Add-Issue owner state.host_evidence_not_hiq "hostAutomationEvidence=$hostEvidence does not contain the HiQ auto contract" }
   }
+}
+
+if ($hookProtocol -ne '1') {
+  Add-Issue hook state.hook_protocol_invalid "hookProtocolVersion=$hookProtocol"
+}
+if ($hookCore -eq 'available' -and $globalHookStatus -ne 'ok') {
+  Add-Issue hook state.hook_core_missing 'hookCoreStatus=available but hiq-hook.cmd is missing from runtime scripts'
+}
+if ($hostLevel -in @('turn-scoped','persistent')) {
+  $hookRunNormalized = $hookLastRun.Replace('\','/')
+  if ((Is-None $hookLastRun) -or -not (Is-SafeRelative $hookLastRun) -or -not $hookRunNormalized.StartsWith('.hiq/hooks/runs/') -or -not (Test-Path -LiteralPath (Resolve-Project $hookLastRun) -PathType Leaf)) {
+    Add-Issue hook state.hook_run_missing "hookLastRunPath=$hookLastRun"
+  }
+  if ($hookLastStatus -ne 'pass') { Add-Issue hook state.hook_run_not_pass "hookLastRunStatus=$hookLastStatus" }
+  if ($hostEvidence -ne $hookLastRun) { Add-Issue hook state.hook_evidence_mismatch "hostAutomationEvidence=$hostEvidence hookLastRunPath=$hookLastRun" }
+} elseif ($hostLevel -eq 'instruction-only' -and -not (Is-None $hookLastRun)) {
+  Add-Issue hook state.hook_run_without_level "hookLastRunPath=$hookLastRun requires hostAutomationLevel turn-scoped or persistent"
 }
 
 $reviewFile = $null
@@ -393,8 +427,8 @@ if ($jsonMode) {
   [ordered]@{
     root = $ResolvedRoot
     project = [ordered]@{ bootstrap = Check-File $bootstrap; memory = Check-File $memory; session = Check-File $session; config = Check-File $config; currentChange = Check-File $current; manifest = Check-File $manifest; evalRoot = Check-Dir (Join-Path $hiq 'eval'); activeChangeDir = $changeDirStatus }
-    runtime = [ordered]@{ hiqHome = $hiqHome; codegraphBin = $codegraphStatus; codegraphIndex = $codegraphIndex; hiqRun = $globalScriptsStatus; hiqStatus = $globalStatusStatus; hiqDoctor = $globalDoctorStatus }
-    state = [ordered]@{ json = $script:State.json; schema = $script:State.schema; reconciliation = $script:State.reconciliation; owner = $script:State.owner; review = $script:State.review; eval = $script:State.eval; checkpoint = $script:State.checkpoint; verify = $script:State.verify; issueCount = $script:IssueCount; issues = @($script:Issues) }
+    runtime = [ordered]@{ hiqHome = $hiqHome; codegraphBin = $codegraphStatus; codegraphIndex = $codegraphIndex; hiqRun = $globalScriptsStatus; hiqStatus = $globalStatusStatus; hiqDoctor = $globalDoctorStatus; hiqHook = $globalHookStatus }
+    state = [ordered]@{ json = $script:State.json; schema = $script:State.schema; reconciliation = $script:State.reconciliation; owner = $script:State.owner; review = $script:State.review; eval = $script:State.eval; checkpoint = $script:State.checkpoint; verify = $script:State.verify; hook = $script:State.hook; issueCount = $script:IssueCount; issues = @($script:Issues) }
     stateOverall = $stateOverall
     overall = $overall
   } | ConvertTo-Json -Depth 8
@@ -414,6 +448,7 @@ if ($jsonMode) {
   Write-Output "runtime.hiq_run=$globalScriptsStatus"
   Write-Output "runtime.hiq_status=$globalStatusStatus"
   Write-Output "runtime.hiq_doctor=$globalDoctorStatus"
+  Write-Output "runtime.hiq_hook=$globalHookStatus"
   foreach ($key in $script:State.Keys) { Write-Output "state.$key=$($script:State[$key])" }
   Write-Output "state.issue_count=$script:IssueCount"
   foreach ($issue in $script:Issues) { Write-Output "issue.$($issue.code)=$($issue.detail)" }

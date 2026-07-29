@@ -13,9 +13,15 @@
 - **content_revision**: 0
 - **entry_skill**: `hiq-auto` | `hiq` | manual
 - **entry_mode**: auto | manual | override | continue | handoff
-- **host_target**: unknown | liveagent | codex | claude | project
-- **host_automation_level**: unavailable | instruction-only | turn-scoped | persistent
-- **host_automation_evidence**: `AGENTS.md` or a verifiable host artifact
+- **host_target**: unknown | generic | claude | codex | pi | liveagent | project | custom
+- **host_automation_level**: unavailable | instruction-only | adapter-available | turn-scoped | persistent
+- **host_automation_evidence**: `AGENTS.md`, `.hiq/hooks/runs/<file>.json`, or a verifiable host artifact
+- **hook_protocol_version**: 1
+- **hook_core_status**: missing | available | running | failed
+- **hook_adapter**: none | generic | claude | codex | pi | liveagent | project | custom
+- **hook_last_event**: pre-session | pre-tool | post-tool | pre-final | checkpoint | status | none
+- **hook_last_run**: `.hiq/hooks/runs/<file>.json` or none
+- **hook_last_status**: none | pass | fail
 - **auto_status**: available | active | manual | disabled | blocked | accepted | handoff
 - **auto_owner**: `hiq-...` or none
 - **auto_reason**:

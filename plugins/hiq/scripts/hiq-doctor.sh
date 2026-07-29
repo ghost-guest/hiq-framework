@@ -153,6 +153,7 @@ state_review=ok
 state_eval=ok
 state_checkpoint=ok
 state_verify=ok
+state_hook=ok
 issue_count=0
 issues=""
 
@@ -172,6 +173,7 @@ record_issue() {
     eval) state_eval=partial ;;
     checkpoint) state_checkpoint=partial ;;
     verify) state_verify=partial ;;
+    hook) state_hook=partial ;;
   esac
 }
 
@@ -208,7 +210,8 @@ codegraph_index="$(check_dir "$ROOT/.codegraph")"
 global_scripts_status="$(check_file "$HIQ_HOME/scripts/hiq-run.sh")"
 global_status_status="$(check_file "$HIQ_HOME/scripts/hiq-status.sh")"
 global_doctor_status="$(check_file "$HIQ_HOME/scripts/hiq-doctor.sh")"
-for status in "$global_scripts_status" "$global_status_status" "$global_doctor_status" "$codegraph_status" "$codegraph_index"; do
+global_hook_status="$(check_file "$HIQ_HOME/scripts/hiq-hook.sh")"
+for status in "$global_scripts_status" "$global_status_status" "$global_doctor_status" "$global_hook_status" "$codegraph_status" "$codegraph_index"; do
   if [[ "$status" != ok ]]; then
     runtime_ok=false
   fi
@@ -235,7 +238,8 @@ schema="$(json_field schema "$CURRENT")"
 framework="$(json_field framework "$CURRENT")"
 required_keys=(
   stateRevision changeId stateStatus contentRevision entrySkill entryMode hostTarget
-  hostAutomationLevel hostAutomationEvidence autoStatus autoOwnerSkill autoReason manualOverride
+  hostAutomationLevel hostAutomationEvidence hookProtocolVersion hookCoreStatus hookAdapter
+  hookLastEvent hookLastRunPath hookLastRunAt hookLastRunStatus autoStatus autoOwnerSkill autoReason manualOverride
   activeChange phase ownerSkill nextSkill nextStep goalId goalPath goalNow acceptanceTarget
   reviewStatus reviewPath reviewedContentRevision acceptedAt evalApplicability evalStatus
   evalRunPath evalReason checkpointRequired checkpointReason resumeSource latestCheckpoint
@@ -262,6 +266,13 @@ entry_mode="$(json_field entryMode "$CURRENT")"
 host_target="$(json_field hostTarget "$CURRENT")"
 host_level="$(json_field hostAutomationLevel "$CURRENT")"
 host_evidence="$(json_field hostAutomationEvidence "$CURRENT")"
+hook_protocol="$(json_field hookProtocolVersion "$CURRENT")"
+hook_core="$(json_field hookCoreStatus "$CURRENT")"
+hook_adapter="$(json_field hookAdapter "$CURRENT")"
+hook_last_event="$(json_field hookLastEvent "$CURRENT")"
+hook_last_run="$(json_field hookLastRunPath "$CURRENT")"
+hook_last_run_at="$(json_field hookLastRunAt "$CURRENT")"
+hook_last_status="$(json_field hookLastRunStatus "$CURRENT")"
 auto_status="$(json_field autoStatus "$CURRENT")"
 auto_owner="$(json_field autoOwnerSkill "$CURRENT")"
 manual_override="$(json_field manualOverride "$CURRENT")"
@@ -292,7 +303,10 @@ verify_status="$(json_field verifyStatus "$CURRENT")"
 verify_waiver="$(json_field verifyWaiverReason "$CURRENT")"
 
 case "$state_status" in idle|active|blocked|handoff|accepted) ;; *) record_issue schema state.status_invalid "stateStatus=$state_status" ;; esac
-case "$host_level" in unavailable|instruction-only|turn-scoped|persistent) ;; *) record_issue schema state.host_level_invalid "hostAutomationLevel=$host_level" ;; esac
+case "$host_level" in unavailable|instruction-only|adapter-available|turn-scoped|persistent) ;; *) record_issue schema state.host_level_invalid "hostAutomationLevel=$host_level" ;; esac
+case "$hook_core" in missing|available|running|failed) ;; *) record_issue hook state.hook_core_invalid "hookCoreStatus=$hook_core" ;; esac
+case "$hook_last_event" in ""|none|null|pre-session|pre-tool|post-tool|pre-final|checkpoint|status) ;; *) record_issue hook state.hook_event_invalid "hookLastEvent=$hook_last_event" ;; esac
+case "$hook_last_status" in none|pass|fail) ;; *) record_issue hook state.hook_status_invalid "hookLastRunStatus=$hook_last_status" ;; esac
 case "$auto_status" in available|active|manual|disabled|blocked|accepted|handoff) ;; *) record_issue schema state.auto_status_invalid "autoStatus=$auto_status" ;; esac
 case "$review_status" in not-run|pending|pass|partial|fail|blocked) ;; *) record_issue schema state.review_status_invalid "reviewStatus=$review_status" ;; esac
 case "$eval_applicability" in unknown|not-applicable|optional|required) ;; *) record_issue schema state.eval_applicability_invalid "evalApplicability=$eval_applicability" ;; esac
@@ -310,6 +324,12 @@ compare_state reconciliation state.entry_mode_mismatch "$entry_mode" "$(md_field
 compare_state reconciliation state.host_target_mismatch "$host_target" "$(md_field host_target "$SESSION")"
 compare_state reconciliation state.host_level_mismatch "$host_level" "$(md_field host_automation_level "$SESSION")"
 compare_state reconciliation state.host_evidence_mismatch "$host_evidence" "$(md_field host_automation_evidence "$SESSION")"
+compare_state reconciliation state.hook_protocol_mismatch "$hook_protocol" "$(md_field hook_protocol_version "$SESSION")"
+compare_state reconciliation state.hook_core_mismatch "$hook_core" "$(md_field hook_core_status "$SESSION")"
+compare_state reconciliation state.hook_adapter_mismatch "$hook_adapter" "$(md_field hook_adapter "$SESSION")"
+compare_state reconciliation state.hook_event_mismatch "$hook_last_event" "$(md_field hook_last_event "$SESSION")"
+compare_state reconciliation state.hook_run_mismatch "$hook_last_run" "$(md_field hook_last_run "$SESSION")"
+compare_state reconciliation state.hook_status_mismatch "$hook_last_status" "$(md_field hook_last_status "$SESSION")"
 compare_state reconciliation state.auto_status_mismatch "$auto_status" "$(md_field auto_status "$SESSION")"
 compare_state reconciliation state.auto_owner_mismatch "$auto_owner" "$(md_field auto_owner "$SESSION")"
 compare_state reconciliation state.manual_override_mismatch "$manual_override" "$(md_field manual_override "$SESSION")"
@@ -384,6 +404,28 @@ elif ! is_none "$host_evidence"; then
     record_issue owner state.host_evidence_missing "hostAutomationEvidence=$host_evidence"
   elif ! grep -q '^# HiQ Project Rule' "$(resolve_project_path "$host_evidence")" 2>/dev/null || ! grep -q 'hiq-auto' "$(resolve_project_path "$host_evidence")" 2>/dev/null; then
     record_issue owner state.host_evidence_not_hiq "hostAutomationEvidence=$host_evidence does not contain the HiQ auto contract"
+  fi
+fi
+
+if [[ "$hook_protocol" != 1 ]]; then
+  record_issue hook state.hook_protocol_invalid "hookProtocolVersion=$hook_protocol"
+fi
+if [[ "$hook_core" == available && "$global_hook_status" != ok ]]; then
+  record_issue hook state.hook_core_missing "hookCoreStatus=available but hiq-hook.sh is missing from runtime scripts"
+fi
+if [[ "$host_level" == turn-scoped || "$host_level" == persistent ]]; then
+  if is_none "$hook_last_run" || ! is_safe_relative_path "$hook_last_run" || [[ "$hook_last_run" != .hiq/hooks/runs/* ]] || [[ ! -f "$(resolve_project_path "$hook_last_run")" ]]; then
+    record_issue hook state.hook_run_missing "hookLastRunPath=$hook_last_run"
+  fi
+  if [[ "$hook_last_status" != pass ]]; then
+    record_issue hook state.hook_run_not_pass "hookLastRunStatus=$hook_last_status"
+  fi
+  if [[ "$host_evidence" != "$hook_last_run" ]]; then
+    record_issue hook state.hook_evidence_mismatch "hostAutomationEvidence=$host_evidence hookLastRunPath=$hook_last_run"
+  fi
+elif [[ "$host_level" == instruction-only ]]; then
+  if ! is_none "$hook_last_run"; then
+    record_issue hook state.hook_run_without_level "hookLastRunPath=$hook_last_run requires hostAutomationLevel turn-scoped or persistent"
   fi
 fi
 
@@ -607,10 +649,10 @@ if $JSON_MODE; then
   printf '  "root": "%s",\n' "$(json_escape "$ROOT")"
   printf '  "project": {"bootstrap":"%s","memory":"%s","session":"%s","config":"%s","currentChange":"%s","manifest":"%s","evalRoot":"%s","activeChangeDir":"%s"},\n' \
     "$(check_file "$BOOTSTRAP")" "$(check_file "$MEMORY")" "$(check_file "$SESSION")" "$(check_file "$CONFIG")" "$(check_file "$CURRENT")" "$(check_file "$MANIFEST")" "$(check_dir "$HIQ/eval")" "$change_dir_status"
-  printf '  "runtime": {"hiqHome":"%s","codegraphBin":"%s","codegraphIndex":"%s","hiqRun":"%s","hiqStatus":"%s","hiqDoctor":"%s"},\n' \
-    "$(json_escape "$HIQ_HOME")" "$codegraph_status" "$codegraph_index" "$global_scripts_status" "$global_status_status" "$global_doctor_status"
-  printf '  "state": {"json":"%s","schema":"%s","reconciliation":"%s","owner":"%s","review":"%s","eval":"%s","checkpoint":"%s","verify":"%s","issueCount":%s,"issues":[' \
-    "$state_json" "$state_schema" "$state_reconciliation" "$state_owner" "$state_review" "$state_eval" "$state_checkpoint" "$state_verify" "$issue_count"
+  printf '  "runtime": {"hiqHome":"%s","codegraphBin":"%s","codegraphIndex":"%s","hiqRun":"%s","hiqStatus":"%s","hiqDoctor":"%s","hiqHook":"%s"},\n' \
+    "$(json_escape "$HIQ_HOME")" "$codegraph_status" "$codegraph_index" "$global_scripts_status" "$global_status_status" "$global_doctor_status" "$global_hook_status"
+  printf '  "state": {"json":"%s","schema":"%s","reconciliation":"%s","owner":"%s","review":"%s","eval":"%s","checkpoint":"%s","verify":"%s","hook":"%s","issueCount":%s,"issues":[' \
+    "$state_json" "$state_schema" "$state_reconciliation" "$state_owner" "$state_review" "$state_eval" "$state_checkpoint" "$state_verify" "$state_hook" "$issue_count"
   first=true
   while IFS='|' read -r code detail; do
     [[ -n "$code" ]] || continue
@@ -637,6 +679,7 @@ else
   echo "runtime.hiq_run=$global_scripts_status"
   echo "runtime.hiq_status=$global_status_status"
   echo "runtime.hiq_doctor=$global_doctor_status"
+  echo "runtime.hiq_hook=$global_hook_status"
   echo "state.json=$state_json"
   echo "state.schema=$state_schema"
   echo "state.reconciliation=$state_reconciliation"
@@ -645,6 +688,7 @@ else
   echo "state.eval=$state_eval"
   echo "state.checkpoint=$state_checkpoint"
   echo "state.verify=$state_verify"
+  echo "state.hook=$state_hook"
   echo "state.issue_count=$issue_count"
   while IFS='|' read -r code detail; do
     [[ -n "$code" ]] || continue

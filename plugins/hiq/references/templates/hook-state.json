@@ -1,0 +1,14 @@
+{
+  "framework": "hiq",
+  "schema": 1,
+  "protocolVersion": 1,
+  "coreStatus": "available",
+  "adapter": "none",
+  "host": "unknown",
+  "automationLevel": "instruction-only",
+  "evidenceRoot": ".hiq/hooks/runs",
+  "lastEvent": null,
+  "lastRunPath": null,
+  "lastRunAt": null,
+  "lastRunStatus": "none"
+}

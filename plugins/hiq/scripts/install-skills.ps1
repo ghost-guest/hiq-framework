@@ -52,7 +52,7 @@ foreach ($dir in $skillDirs) {
 
 if ($Apply -ne 1) {
   Write-Output "mode=preview count=$count"
-  Write-Output "note=apply=1 also installs Cleboost/codegraph-rs plus hiq-status/hiq-doctor into ~/.hiq/scripts and host helper copies"
+  Write-Output "note=apply=1 also installs Cleboost/codegraph-rs plus hiq-status/hiq-doctor/hiq-hook into ~/.hiq/scripts and host helper copies"
   exit 0
 }
 

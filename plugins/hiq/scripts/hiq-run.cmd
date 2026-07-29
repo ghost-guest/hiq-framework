@@ -1,11 +1,11 @@
 @echo off
 REM Dispatcher: hiq-run.cmd <task> [args...]
-REM tasks: install-codegraph | project-init | init-project | install-skills | configure-mcp | codegraph | status | doctor | smoke
+REM tasks: install-codegraph | project-init | init-project | install-skills | configure-mcp | codegraph | hook | status | doctor | smoke
 setlocal EnableExtensions
 set "SCRIPT_DIR=%~dp0"
 set "TASK=%~1"
 if "%TASK%"=="" (
-  echo usage: hiq-run.cmd install-codegraph^|project-init^|init-project^|install-skills^|configure-mcp^|codegraph^|status^|doctor^|smoke [...]
+  echo usage: hiq-run.cmd install-codegraph^|project-init^|init-project^|install-skills^|configure-mcp^|codegraph^|hook^|status^|doctor^|smoke [...]
   exit /b 2
 )
 shift
@@ -34,6 +34,10 @@ if /I "%TASK%"=="configure-mcp" (
 )
 if /I "%TASK%"=="codegraph" (
   call "%SCRIPT_DIR%codegraph.cmd" %1 %2 %3 %4 %5 %6 %7 %8 %9
+  exit /b %ERRORLEVEL%
+)
+if /I "%TASK%"=="hook" (
+  call "%SCRIPT_DIR%hiq-hook.cmd" %1 %2 %3 %4 %5 %6 %7 %8 %9
   exit /b %ERRORLEVEL%
 )
 if /I "%TASK%"=="status" (

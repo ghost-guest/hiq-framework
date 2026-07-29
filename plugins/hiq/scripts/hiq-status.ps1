@@ -50,6 +50,13 @@ $entrySkill = Get-JsonValue $currentObj 'entrySkill'; if (-not $entrySkill) { $e
 $entryMode = Get-JsonValue $currentObj 'entryMode'; if (-not $entryMode) { $entryMode = Get-MdField 'entry_mode' $session }
 $hostTarget = Get-JsonValue $currentObj 'hostTarget'
 $hostLevel = Get-JsonValue $currentObj 'hostAutomationLevel'
+$hostEvidence = Get-JsonValue $currentObj 'hostAutomationEvidence'; if (-not $hostEvidence) { $hostEvidence = Get-MdField 'host_automation_evidence' $session }
+$hookProtocol = Get-JsonValue $currentObj 'hookProtocolVersion'; if (-not $hookProtocol) { $hookProtocol = Get-MdField 'hook_protocol_version' $session }
+$hookCore = Get-JsonValue $currentObj 'hookCoreStatus'; if (-not $hookCore) { $hookCore = Get-MdField 'hook_core_status' $session }
+$hookAdapter = Get-JsonValue $currentObj 'hookAdapter'; if (-not $hookAdapter) { $hookAdapter = Get-MdField 'hook_adapter' $session }
+$hookLastEvent = Get-JsonValue $currentObj 'hookLastEvent'; if (-not $hookLastEvent) { $hookLastEvent = Get-MdField 'hook_last_event' $session }
+$hookLastRun = Get-JsonValue $currentObj 'hookLastRunPath'; if (-not $hookLastRun) { $hookLastRun = Get-MdField 'hook_last_run' $session }
+$hookLastStatus = Get-JsonValue $currentObj 'hookLastRunStatus'; if (-not $hookLastStatus) { $hookLastStatus = Get-MdField 'hook_last_status' $session }
 $autoStatus = Get-JsonValue $currentObj 'autoStatus'; if (-not $autoStatus) { $autoStatus = Get-MdField 'auto_status' $session }
 $autoOwner = Get-JsonValue $currentObj 'autoOwnerSkill'; if (-not $autoOwner) { $autoOwner = Get-MdField 'auto_owner' $session }
 $autoReason = Get-JsonValue $currentObj 'autoReason'; if (-not $autoReason) { $autoReason = Get-MdField 'auto_reason' $session }
@@ -74,6 +81,8 @@ $verifyStatus = Get-JsonValue $currentObj 'verifyStatus'; if (-not $verifyStatus
 $updated = Get-JsonValue $currentObj 'updatedAt'; if (-not $updated) { $updated = Get-MdField 'updated' $session }
 if ($activeChange -in @('', 'null')) { $activeChange = 'none' }
 if ($reviewPath -in @('', 'null')) { $reviewPath = 'none' }
+if ($hookLastEvent -in @('', 'null')) { $hookLastEvent = 'none' }
+if ($hookLastRun -in @('', 'null')) { $hookLastRun = 'none' }
 if ($checkpoint -in @('', 'null')) { $checkpoint = 'none' }
 
 $pointerStatus = 'ok'
@@ -101,6 +110,13 @@ if ($Mode -eq '--json') {
     entryMode = $entryMode
     hostTarget = $hostTarget
     hostAutomationLevel = $hostLevel
+    hostAutomationEvidence = $hostEvidence
+    hookProtocolVersion = $hookProtocol
+    hookCoreStatus = $hookCore
+    hookAdapter = $hookAdapter
+    hookLastEvent = $hookLastEvent
+    hookLastRunPath = $hookLastRun
+    hookLastRunStatus = $hookLastStatus
     autoStatus = $autoStatus
     autoOwnerSkill = $autoOwner
     autoReason = $autoReason
@@ -134,6 +150,13 @@ Write-Output ("entry_skill={0}" -f $(if ($entrySkill) { $entrySkill } else { 'un
 Write-Output ("entry_mode={0}" -f $(if ($entryMode) { $entryMode } else { 'unknown' }))
 Write-Output ("host_target={0}" -f $(if ($hostTarget) { $hostTarget } else { 'unknown' }))
 Write-Output ("host_automation_level={0}" -f $(if ($hostLevel) { $hostLevel } else { 'unknown' }))
+Write-Output ("host_automation_evidence={0}" -f $(if ($hostEvidence) { $hostEvidence } else { 'none' }))
+Write-Output ("hook_protocol_version={0}" -f $(if ($hookProtocol) { $hookProtocol } else { 'unknown' }))
+Write-Output ("hook_core_status={0}" -f $(if ($hookCore) { $hookCore } else { 'unknown' }))
+Write-Output ("hook_adapter={0}" -f $(if ($hookAdapter) { $hookAdapter } else { 'none' }))
+Write-Output ("hook_last_event={0}" -f $(if ($hookLastEvent) { $hookLastEvent } else { 'none' }))
+Write-Output ("hook_last_run={0}" -f $(if ($hookLastRun) { $hookLastRun } else { 'none' }))
+Write-Output ("hook_last_status={0}" -f $(if ($hookLastStatus) { $hookLastStatus } else { 'none' }))
 Write-Output ("auto_status={0}" -f $(if ($autoStatus) { $autoStatus } else { 'unknown' }))
 Write-Output ("auto_owner={0}" -f $(if ($autoOwner) { $autoOwner } else { 'unknown' }))
 Write-Output ("auto_reason={0}" -f $autoReason)

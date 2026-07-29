@@ -26,7 +26,10 @@ mkdir -p \
   "$HIQ/graph" \
   "$HIQ/profile" \
   "$HIQ/eval" \
-  "$HIQ/eval/runs"
+  "$HIQ/eval/runs" \
+  "$HIQ/hooks" \
+  "$HIQ/hooks/runs" \
+  "$HIQ/hooks/adapters"
 
 write_if_absent() {
   local path="$1"
@@ -200,6 +203,14 @@ verify:
   require_structured_state: true
   check_cwd: true
   check_local_paths: true
+hook:
+  protocol_version: 1
+  core_command_posix: bash "$HOME/.hiq/scripts/hiq-hook.sh"
+  core_command_windows: '%USERPROFILE%\.hiq\scripts\hiq-hook.cmd'
+  adapter: none
+  adapters_dir: .hiq/hooks/adapters
+  evidence_root: .hiq/hooks/runs
+  require_run_evidence_for_level: turn-scoped
 skill:
   retained_count: 11
   stable_surface: true
@@ -226,6 +237,13 @@ write_if_absent "$HIQ/current-change.json" "{
   \"hostTarget\": \"unknown\",
   \"hostAutomationLevel\": \"instruction-only\",
   \"hostAutomationEvidence\": \"AGENTS.md\",
+  \"hookProtocolVersion\": 1,
+  \"hookCoreStatus\": \"available\",
+  \"hookAdapter\": \"none\",
+  \"hookLastEvent\": null,
+  \"hookLastRunPath\": null,
+  \"hookLastRunAt\": null,
+  \"hookLastRunStatus\": \"none\",
   \"autoStatus\": \"available\",
   \"autoOwnerSkill\": \"hiq-session\",
   \"autoReason\": \"project rule is available; the host must load instructions before hiq-auto can coordinate this turn\",
@@ -277,6 +295,12 @@ write_if_absent "$HIQ/session.md" "# Session
 - **host_target**: unknown
 - **host_automation_level**: instruction-only
 - **host_automation_evidence**: \`AGENTS.md\`
+- **hook_protocol_version**: 1
+- **hook_core_status**: available
+- **hook_adapter**: none
+- **hook_last_event**: none
+- **hook_last_run**: none
+- **hook_last_status**: none
 - **auto_status**: available
 - **auto_owner**: \`hiq-session\`
 - **auto_reason**: project rule is available; the host must load instructions before hiq-auto can coordinate this turn
@@ -413,6 +437,34 @@ HiQ-native evaluation scaffold absorbed from the useful Comet ideas.
 - reports: \`.hiq/eval/runs/\`
 - review owner: \`hiq-review\`
 - framework governance owner: \`hiq-skill\`
+"
+
+write_if_absent "$HIQ/hooks/README.md" "# HiQ Hooks
+
+Host-neutral hook evidence lives here.
+
+- protocol: .hiq/hooks/hook-state.json + .hiq/hooks/runs/
+- adapters: .hiq/hooks/adapters/
+- core command: bash \"\$HOME/.hiq/scripts/hiq-hook.sh\" . pre-session --host=generic --adapter=generic
+- Windows: %USERPROFILE%\\.hiq\\scripts\\hiq-hook.cmd . pre-session --host=generic --adapter=generic
+
+Do not claim host-level automation from this directory alone. Run evidence under .hiq/hooks/runs/ is required.
+"
+
+write_if_absent "$HIQ/hooks/hook-state.json" "{
+  \"framework\": \"hiq\",
+  \"schema\": 1,
+  \"protocolVersion\": 1,
+  \"coreStatus\": \"available\",
+  \"adapter\": \"none\",
+  \"host\": \"unknown\",
+  \"automationLevel\": \"instruction-only\",
+  \"evidenceRoot\": \".hiq/hooks/runs\",
+  \"lastEvent\": null,
+  \"lastRunPath\": null,
+  \"lastRunAt\": null,
+  \"lastRunStatus\": \"none\"
+}
 "
 
 write_if_absent "$HIQ/eval/eval.yaml" "schema: 2

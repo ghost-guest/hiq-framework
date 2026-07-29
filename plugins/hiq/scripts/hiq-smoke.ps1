@@ -29,6 +29,7 @@ New-Item -ItemType Directory -Path (Join-Path $smokeHome 'bin') -Force | Out-Nul
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-run.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-status.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
 Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-doctor.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
+Copy-Item -LiteralPath (Join-Path $scriptDir 'hiq-hook.cmd') -Destination (Join-Path $smokeHome 'scripts') -Force
 $env:HIQ_HOME_DIR = $smokeHome
 $env:HIQ_BIN_DIR = Join-Path $smokeHome 'bin'
 
@@ -44,6 +45,8 @@ try {
   if ([string]$current.schema -ne '2') { Fail 'current-change.json did not use schema 2' }
   if ([string]$current.entrySkill -ne 'hiq-auto') { Fail 'missing entrySkill in current-change.json' }
   if ([string]$current.hostAutomationLevel -ne 'instruction-only') { Fail 'missing hostAutomationLevel in current-change.json' }
+  if ([string]$current.hookCoreStatus -ne 'available') { Fail 'missing hookCoreStatus in current-change.json' }
+  if ([string]$current.hookAdapter -ne 'none') { Fail 'fresh init must not pin a host adapter' }
   if ([string]$current.autoStatus -ne 'available') { Fail 'fresh init must report autoStatus=available' }
   if ([string]$current.autoOwnerSkill -ne 'hiq-session') { Fail 'missing autoOwnerSkill in current-change.json' }
   if ([string]$current.reviewStatus -ne 'not-run') { Fail 'missing reviewStatus in current-change.json' }
@@ -70,12 +73,26 @@ try {
   if ($statusOut -notmatch 'session=ok') { Fail 'status did not report session=ok after init-project' }
   if ($statusOut -notmatch 'entry_skill=hiq-auto') { Fail 'status should report entry_skill=hiq-auto after init-project' }
   if ($statusOut -notmatch 'host_automation_level=instruction-only') { Fail 'status should report instruction-only host automation' }
+  if ($statusOut -notmatch 'hook_core_status=available') { Fail 'status should report available hook core' }
+  if ($statusOut -notmatch 'hook_adapter=none') { Fail 'status should report no pinned host adapter on fresh init' }
   if ($statusOut -notmatch 'auto_status=available') { Fail 'status should report autoStatus=available before a real turn enters' }
   if ($statusOut -notmatch 'auto_owner=hiq-session') { Fail 'status should report auto_owner=hiq-session after init-project' }
   if ($statusOut -notmatch 'pointer_status=ok') { Fail 'status should report an aligned fresh pointer' }
   if ($doctorPre -notmatch 'runtime.codegraph_index=missing') { Fail 'doctor should report missing codegraph index before project-init' }
+  if ($doctorPre -notmatch 'runtime.hiq_hook=ok') { Fail 'doctor should report available hook core runtime script' }
+  if ($doctorPre -notmatch 'state.hook=ok') { Fail 'doctor should report hook state healthy after init-project' }
   if ($doctorPre -notmatch 'state.overall=ok') { Fail 'doctor should report semantic state healthy after init-project' }
   if ($doctorPre -notmatch 'overall=partial') { Fail 'doctor should report overall=partial before project-init' }
+
+  $hookOut = & (Join-Path $scriptDir 'hiq-hook.ps1') $SmokeRoot 'pre-session' -HostName 'generic' -Adapter 'generic' | Out-String
+  if ($hookOut -notmatch 'hook.status=pass') { Fail 'hook core did not report pass' }
+  $hookStatus = & (Join-Path $scriptDir 'hiq-status.ps1') $SmokeRoot | Out-String
+  if ($hookStatus -notmatch 'host_automation_level=turn-scoped') { Fail 'hook run should promote host automation to turn-scoped' }
+  if ($hookStatus -notmatch 'hook_adapter=generic') { Fail 'hook run should record generic adapter' }
+  if ($hookStatus -notmatch 'hook_last_event=pre-session') { Fail 'hook run should record last event' }
+  $doctorHook = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
+  if ($doctorHook -notmatch 'state.hook=ok') { Fail 'doctor should accept hook run evidence' }
+  if ($doctorHook -notmatch 'state.overall=ok') { Fail 'doctor should keep semantic state healthy after hook run' }
 
   Write-Output "hiq-smoke: project-init root=$SmokeRoot"
   $previousErrorActionPreference = $ErrorActionPreference
@@ -106,6 +123,17 @@ try {
   & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot --strict | Out-Null
   if ($LASTEXITCODE -eq 0) { Fail 'strict doctor accepted owner/phase drift' }
   Copy-Item -LiteralPath $currentBackup -Destination $currentPath -Force
+
+  $fixture = Get-Content -LiteralPath $currentPath -Raw | ConvertFrom-Json
+  $fixture.hostAutomationEvidence = '.hiq/hooks/runs/missing-hook.json'
+  $fixture | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $currentPath -Encoding UTF8
+  $sessionText = Get-Content -LiteralPath $sessionPath -Raw
+  $sessionText = $sessionText -replace '(?m)^- \*\*host_automation_evidence\*\*:.*$', '- **host_automation_evidence**: `.hiq/hooks/runs/missing-hook.json`'
+  Set-Content -LiteralPath $sessionPath -Value $sessionText -Encoding UTF8
+  & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot --strict | Out-Null
+  if ($LASTEXITCODE -eq 0) { Fail 'strict doctor accepted missing host automation evidence' }
+  Copy-Item -LiteralPath $currentBackup -Destination $currentPath -Force
+  Copy-Item -LiteralPath $sessionBackup -Destination $sessionPath -Force
 
   $fixture = Get-Content -LiteralPath $currentPath -Raw | ConvertFrom-Json
   $fixture.stateStatus = 'accepted'; $fixture.autoStatus = 'accepted'; $fixture.reviewStatus = 'pass'
