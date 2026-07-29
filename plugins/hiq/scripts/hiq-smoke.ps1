@@ -78,7 +78,11 @@ try {
   if ($doctorPre -notmatch 'overall=partial') { Fail 'doctor should report overall=partial before project-init' }
 
   Write-Output "hiq-smoke: project-init root=$SmokeRoot"
-  & (Join-Path $scriptDir 'codegraph-project-init.cmd') $SmokeRoot | Out-Null
+  $projectInitOut = & (Join-Path $scriptDir 'codegraph-project-init.cmd') $SmokeRoot 2>&1 | Out-String
+  if ($LASTEXITCODE -ne 0) {
+    Write-Output $projectInitOut.TrimEnd()
+    Fail "project-init failed exit=$LASTEXITCODE"
+  }
 
   $doctorPost = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
   if ($doctorPost -notmatch 'runtime.codegraph_index=ok') { Fail 'doctor should report codegraph index ok after project-init' }
