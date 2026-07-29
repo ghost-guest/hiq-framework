@@ -25,7 +25,13 @@ if defined HIQ_BIN_DIR if not defined HIQ_CODEGRAPH set "BIN=%HIQ_BIN_DIR%\codeg
 if not exist "%BIN%" (
   echo hiq-cg-init: installing codegraph-rs...
   call "%SCRIPT_DIR%install-codegraph.cmd"
-  set "BIN=%USERPROFILE%\.hiq\bin\codegraph.exe"
+  if not defined HIQ_CODEGRAPH (
+    if defined HIQ_BIN_DIR (
+      set "BIN=%HIQ_BIN_DIR%\codegraph.exe"
+    ) else (
+      set "BIN=%USERPROFILE%\.hiq\bin\codegraph.exe"
+    )
+  )
 )
 if not exist "%BIN%" (
   echo hiq-cg-init: binary missing after install
