@@ -6,7 +6,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Get-FullPath([string]$Path) {
-  return [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Path))
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+  return [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $Path))
 }
 
 $resolvedRoot = Get-FullPath $Root

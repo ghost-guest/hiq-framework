@@ -13,7 +13,10 @@ if ($Root.StartsWith('--')) {
 if ($Mode -notin @('', '--json')) { Write-Error "unknown option: $Mode"; exit 2 }
 
 function Get-FullPath([string]$Path) {
-  return [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Path))
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+  return [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $Path))
 }
 
 function Get-MdField([string]$Key, [string]$Path) {

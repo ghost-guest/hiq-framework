@@ -17,7 +17,14 @@ function Write-IfAbsent([string]$Path, [string]$Content) {
   Write-Output "created=$Path"
 }
 
-$resolvedRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Root))
+function Get-FullPath([string]$Path) {
+  if ([System.IO.Path]::IsPathRooted($Path)) {
+    return [System.IO.Path]::GetFullPath($Path)
+  }
+  return [System.IO.Path]::GetFullPath((Join-Path (Get-Location).Path $Path))
+}
+
+$resolvedRoot = Get-FullPath $Root
 $hiq = Join-Path $resolvedRoot ".hiq"
 $stamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
 $currentPreexisted = Test-Path -LiteralPath (Join-Path $hiq 'current-change.json')
