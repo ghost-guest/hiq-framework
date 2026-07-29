@@ -78,10 +78,14 @@ try {
   if ($doctorPre -notmatch 'overall=partial') { Fail 'doctor should report overall=partial before project-init' }
 
   Write-Output "hiq-smoke: project-init root=$SmokeRoot"
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
   $projectInitOut = & (Join-Path $scriptDir 'codegraph-project-init.cmd') $SmokeRoot 2>&1 | Out-String
-  if ($LASTEXITCODE -ne 0) {
+  $projectInitExit = $LASTEXITCODE
+  $ErrorActionPreference = $previousErrorActionPreference
+  if ($projectInitExit -ne 0) {
     Write-Output $projectInitOut.TrimEnd()
-    Fail "project-init failed exit=$LASTEXITCODE"
+    Fail "project-init failed exit=$projectInitExit"
   }
 
   $doctorPost = & (Join-Path $scriptDir 'hiq-doctor.ps1') $SmokeRoot | Out-String
