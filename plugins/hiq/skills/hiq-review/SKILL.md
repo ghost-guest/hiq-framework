@@ -66,6 +66,7 @@ STATE classify:
     release note / merge recommendation is the active task -> closeout
     session/context switch during proof work -> handoff
   create or refresh `.hiq/changes/<id>/review.md`
+  record `content_revision`, `reviewed_content_revision`, exact `verdict`, and the review artifact path in current-change/session state
 
 STATE load_scope:
   read in order:
@@ -141,6 +142,8 @@ STATE evidence_gate:
 STATE eval_gate:
   when mode=eval or eval artifacts exist:
     inspect `.hiq/eval/eval.yaml` and the chosen run/report
+    classify `evalApplicability` as unknown | not-applicable | optional | required
+    when not applicable, record a reason; when required, record a current run path and status
     ask:
       is the task set relevant to this change?
       are the rubric and acceptance target aligned?
@@ -176,6 +179,7 @@ STATE verdict:
     protected good paths are proven where needed
     evidence belongs to the current revision/worktree
     eval results, when used, do not contradict the release claim
+    `reviewed_content_revision` matches the current content revision
   PARTIAL if some proof exists but the release bar is not met
   BLOCKED if the remaining acceptance proof depends on user-owned external input that is not available yet
   FAIL if key acceptance proof is missing, a critical command is red, eval reveals an unaddressed required gap, or required findings remain
@@ -262,6 +266,7 @@ next: hiq-review | hiq-implement | hiq-debug | hiq-grill | hiq-session
 - No PASS for MVP / prototype / first-version / placeholder work unless that downgrade was explicitly approved
 - No PASS while acceptance-critical user-owned inputs are still pending
 - No review state living only in chat while `review.md` is stale
+- No accepted state without an exact PASS verdict and current content revision proof in `review.md`
 
 ## Anti-patterns
 

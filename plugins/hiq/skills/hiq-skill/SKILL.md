@@ -143,6 +143,7 @@ STATE release_gate:
     overlap with sibling skills is explicit
     docs/catalog/changelog are aligned
     scripts/templates are aligned with skill contracts
+    runtime state reports host automation capability honestly and validates semantic closure
     host/runtime sync is done where needed
     checkpoint captures the framework decision if the change was substantial
 ```
@@ -181,6 +182,8 @@ If any item is false, do not add a new retained skill.
 - Do not change framework surface without stating what remains stable for users
 - Large framework restructures require explicit user approval
 - Do not let eval or bundle assets drift outside the retained-owner model
+- Do not treat `auto.enabled` or `AGENTS.md` as proof of a running host hook
+- Do not accept schema/state changes without matching doctor and smoke coverage
 
 ## Announce
 
@@ -205,4 +208,4 @@ next: sync | review | checkpoint
 
 ## Done
 
-The framework change is justified, the retained surface stays coherent, every affected source of truth is aligned, and users do not have to relearn a fragmented skill map.
+The framework change is justified, the retained surface stays coherent, every affected source of truth is aligned, runtime state claims are verifiable, and users do not have to relearn a fragmented skill map.

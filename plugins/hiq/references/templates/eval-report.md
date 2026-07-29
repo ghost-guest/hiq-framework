@@ -1,6 +1,8 @@
 # Eval Report — <title>
 
 - **change**: `.hiq/changes/<id>/`
+- **change_id**: `<id>`
+- **content_revision**: 0
 - **config**: `.hiq/eval/eval.yaml`
 - **run_id**:
 - **status**: draft | running | done | blocked

@@ -1,19 +1,24 @@
 framework: hiq
-schema: 1
+schema: 2
 language: zh-CN
 artifacts:
   root: .hiq
   session: .hiq/session.md
   current_change: .hiq/current-change.json
   eval_root: .hiq/eval
+state:
+  semantic_doctor: true
+  require_schema: 2
+  require_pointer_reconciliation: true
 resume:
   prefer_local_state: true
   require_checkpoint_before_handoff: true
   status_command_posix: bash "$HOME/.hiq/scripts/hiq-status.sh" .
-  status_command_windows: '%USERPROFILE%\\.hiq\\scripts\\hiq-status.cmd .'
+  status_command_windows: '%USERPROFILE%\.hiq\scripts\hiq-status.cmd .'
 review:
   require_fresh_evidence: true
   eval_enabled: true
+  eval_enabled_meaning: capability
   eval_config: .hiq/eval/eval.yaml
 auto:
   enabled: true
@@ -23,6 +28,12 @@ auto:
   auto_resume: true
   require_review_acceptance: true
   allow_explicit_skill_override: true
+  host_automation_level: instruction-only
+  host_automation_evidence: AGENTS.md
+verify:
+  require_structured_state: true
+  check_cwd: true
+  check_local_paths: true
 skill:
   retained_count: 11
   stable_surface: true
@@ -32,7 +43,9 @@ skill:
 install:
   managed_runtime_home: ~/.hiq
   doctor_command_posix: bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
-  doctor_command_windows: '%USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd .'
+  doctor_command_windows: '%USERPROFILE%\.hiq\scripts\hiq-doctor.cmd .'
+  doctor_strict_posix: bash "$HOME/.hiq/scripts/hiq-doctor.sh" . --strict
+  doctor_strict_windows: '%USERPROFILE%\.hiq\scripts\hiq-doctor.cmd . --strict'
   host_targets:
     - liveagent
     - codex

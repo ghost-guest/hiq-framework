@@ -23,7 +23,9 @@ A smoke pass is acceptable only when all of these are true:
 - project init can create a new `.hiq/` baseline
 - project rule / auto entry is present after init
 - status and doctor commands run from the platform-native entrypoint
-- doctor reports `overall=partial` before CodeGraph init and `overall=ok` only after `.codegraph/` exists
+- doctor reports semantic state separately from runtime health; `state.overall=ok` after init and `overall=partial` before CodeGraph init
+- doctor reports `overall=ok` only after `.codegraph/` exists and the runtime home is complete
+- `hiq-doctor --strict` rejects owner drift, accepted state without current review proof, unknown eval applicability, missing checkpoints, and stale verify paths
 - installed runtime copies include the expected scripts and skills
 - no committed template forces machine-absolute paths or a single shell assumption
 
@@ -151,6 +153,8 @@ Search for bad committed assumptions after edits:
 - machine-absolute paths in committed templates
 - bash-only runtime instructions with no Windows peer for key runtime surfaces
 - goal templates missing owner / acceptance / evidence tracking
+- templates claiming automatic execution without host capability or evidence fields
+- schema 2 state fields missing from either POSIX or Windows init output
 
 Suggested checks:
 

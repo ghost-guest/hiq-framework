@@ -12,7 +12,8 @@
 test -f plugins/hiq/skills/hiq-grill/SKILL.md
 test -x "$HOME/.hiq/bin/codegraph" && "$HOME/.hiq/bin/codegraph" --version
 bash plugins/hiq/scripts/hiq-status.sh .
-bash plugins/hiq/scripts/hiq-doctor.sh . || true
+bash plugins/hiq/scripts/hiq-doctor.sh .
+bash plugins/hiq/scripts/hiq-doctor.sh . --strict || true
 ```
 
 ## Read order
@@ -61,8 +62,9 @@ bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
 
 上下文压力升高时：
 1. 先写 `context-checkpoints/<name>-<date>.md`
-2. 把路径写进 `.hiq/session.md` 与 `.hiq/current-change.json`
-3. 新会话用 `$hiq-session` 继续
+2. 把路径写进 `.hiq/session.md`、`.hiq/current-change.json` 与 active goal（如有）
+3. 设置 `checkpointRequired` 与 `checkpointReason`
+4. 新会话用 `$hiq-session` 继续
 
 ## Resume
 

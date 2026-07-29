@@ -20,6 +20,8 @@ function Write-IfAbsent([string]$Path, [string]$Content) {
 $resolvedRoot = [System.IO.Path]::GetFullPath((Join-Path (Get-Location) $Root))
 $hiq = Join-Path $resolvedRoot ".hiq"
 $stamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
+$currentPreexisted = Test-Path -LiteralPath (Join-Path $hiq 'current-change.json')
+$sessionPreexisted = Test-Path -LiteralPath (Join-Path $hiq 'session.md')
 
 $dirs = @(
   "requirements", "architecture", "adr", "spec", "grill", "tasks", "changes", "archive",
@@ -169,13 +171,17 @@ Write-IfAbsent (Join-Path $hiq "attention.md") $attention
 
 $config = @'
 framework: hiq
-schema: 1
+schema: 2
 language: zh-CN
 artifacts:
   root: .hiq
   session: .hiq/session.md
   current_change: .hiq/current-change.json
   eval_root: .hiq/eval
+state:
+  semantic_doctor: true
+  require_schema: 2
+  require_pointer_reconciliation: true
 resume:
   prefer_local_state: true
   require_checkpoint_before_handoff: true
@@ -184,6 +190,7 @@ resume:
 review:
   require_fresh_evidence: true
   eval_enabled: true
+  eval_enabled_meaning: capability
   eval_config: .hiq/eval/eval.yaml
 auto:
   enabled: true
@@ -193,25 +200,43 @@ auto:
   auto_resume: true
   require_review_acceptance: true
   allow_explicit_skill_override: true
+  host_automation_level: instruction-only
+  host_automation_evidence: AGENTS.md
+verify:
+  require_structured_state: true
+  check_cwd: true
+  check_local_paths: true
 skill:
   retained_count: 11
   stable_surface: true
+  compose_enabled: true
+  bundle_enabled: true
+  publish_enabled: true
 install:
   managed_runtime_home: ~/.hiq
   doctor_command_posix: bash "$HOME/.hiq/scripts/hiq-doctor.sh" .
   doctor_command_windows: '%USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd .'
+  doctor_strict_posix: bash "$HOME/.hiq/scripts/hiq-doctor.sh" . --strict
+  doctor_strict_windows: '%USERPROFILE%\\.hiq\\scripts\\hiq-doctor.cmd . --strict'
 '@
 Write-IfAbsent (Join-Path $hiq "config.yaml") $config
 
 $current = @'
 {
   "framework": "hiq",
-  "schema": 1,
+  "schema": 2,
+  "stateRevision": 1,
+  "changeId": null,
+  "stateStatus": "idle",
+  "contentRevision": 0,
   "entrySkill": "hiq-auto",
   "entryMode": "auto",
-  "autoStatus": "active",
+  "hostTarget": "unknown",
+  "hostAutomationLevel": "instruction-only",
+  "hostAutomationEvidence": "AGENTS.md",
+  "autoStatus": "available",
   "autoOwnerSkill": "hiq-session",
-  "autoReason": "project auto rule enabled; rebuild pointer or start the first truthful owner skill",
+  "autoReason": "project rule is available; the host must load instructions before hiq-auto can coordinate this turn",
   "manualOverride": "none",
   "activeChange": null,
   "phase": "idle",
@@ -222,7 +247,22 @@ $current = @'
   "goalPath": null,
   "goalNow": "",
   "acceptanceTarget": "",
+  "reviewStatus": "not-run",
+  "reviewPath": null,
+  "reviewedContentRevision": null,
+  "acceptedAt": null,
+  "evalApplicability": "not-applicable",
+  "evalStatus": "not-applicable",
+  "evalRunPath": null,
+  "evalReason": "no active change",
+  "checkpointRequired": false,
+  "checkpointReason": "none",
+  "resumeSource": "fresh",
   "latestCheckpoint": null,
+  "verifyCommandsSource": ".hiq/session.md",
+  "verifyCwd": ".",
+  "verifyStatus": "unset",
+  "verifyWaiverReason": "no verification command recorded",
   "updatedAt": "__STAMP__"
 }
 '@.Replace("__STAMP__", $stamp)
@@ -238,11 +278,18 @@ $session = @'
 - **started**: __STAMP__
 - **updated**: __STAMP__
 - **agent**:
+- **state_revision**: 1
+- **change_id**: none
+- **state_status**: idle
+- **content_revision**: 0
 - **entry_skill**: `hiq-auto`
 - **entry_mode**: auto
-- **auto_status**: active
+- **host_target**: unknown
+- **host_automation_level**: instruction-only
+- **host_automation_evidence**: `AGENTS.md`
+- **auto_status**: available
 - **auto_owner**: `hiq-session`
-- **auto_reason**: project auto rule enabled; rebuild pointer or start the first truthful owner skill
+- **auto_reason**: project rule is available; the host must load instructions before hiq-auto can coordinate this turn
 - **manual_override**: none
 - **active_change**: none
 - **phase**: idle
@@ -260,11 +307,22 @@ $session = @'
 
 ## Work Now
 
-- **goal_record**: `.hiq/goals/<id>.md` or none
+- **goal_record**: none
 - **goal_now**:
 - **blockers**:
 - **acceptance_target**:
+- **review_status**: not-run
+- **review_path**: none
+- **reviewed_content_revision**: none
+- **eval_applicability**: not-applicable
+- **eval_status**: not-applicable
+- **eval_run_path**: none
+- **eval_reason**: no active change
 - **verify_commands**:
+- **verify_commands_source**: `.hiq/session.md`
+- **verify_cwd**: `.`
+- **verify_status**: unset
+- **verify_waiver_reason**: no verification command recorded
 
 ## Code / Graph
 
@@ -274,6 +332,9 @@ $session = @'
 
 ## Resume Safety
 
+- **checkpoint_required**: no
+- **checkpoint_reason**: none
+- **resume_source**: fresh
 - **latest_checkpoint**: none
 - **compact_safe_summary**:
 
@@ -382,9 +443,13 @@ HiQ-native evaluation scaffold absorbed from the useful Comet ideas.
 Write-IfAbsent (Join-Path $hiq "eval\README.md") $evalReadme
 
 $evalYaml = @'
-schema: 1
+schema: 2
 name: hiq-local-eval
 root: .
+capability:
+  enabled: true
+  meaning: available-not-required
+  applicability_source: .hiq/current-change.json
 artifacts:
   session: .hiq/session.md
   current_change: .hiq/current-change.json
@@ -409,6 +474,10 @@ rubric:
     weight: 0.2
 outputs:
   report_root: .hiq/eval/runs
+  review_ingest: .hiq/changes/<id>/review.md
+notes:
+  - Eval availability does not make every change eval-required.
+  - Record eval applicability, status, run path, and reason in current-change state.
 '@
 Write-IfAbsent (Join-Path $hiq "eval\eval.yaml") $evalYaml
 
@@ -439,21 +508,40 @@ if (-not (Test-Path -LiteralPath $manifestPath)) {
 $agents = @'
 # HiQ Project Rule
 
-On every new conversation in this project, activate `hiq-auto` first unless the user explicitly disables auto mode for this turn.
+This repository requests `hiq-auto` as the first HiQ coordination layer for new conversations unless the user explicitly disables auto mode for the turn.
+
+This file is an instruction contract, not proof that a host hook executed. The current automation capability must be reported from `.hiq/current-change.json`; a fresh project starts at `instruction-only` until the host provides verifiable stronger evidence.
 
 ## Required behavior
 
-1. Treat `hiq-auto` as the outer automation wrapper.
+1. Treat `hiq-auto` as the outer coordination wrapper when the host loaded this project rule.
 2. Keep the retained owner surface at 11.
-3. For normal work, enter goal mode:
+3. Enter goal mode for normal work:
    - create or refresh `.hiq/goals/<id>.md`
-   - choose the truthful current owner skill
-   - continue until `hiq-review` proves acceptance or a real blocker is recorded
-4. Update `.hiq/session.md` and `.hiq/current-change.json` after meaningful owner changes.
-5. Ask the user only for genuine decisions that local truth cannot answer.
-6. If context pressure rises, checkpoint first, then resume through `hiq-auto`.
+   - lease ownership to the truthful current owner skill before meaningful work
+   - append the owner transition after the step and refresh session/current-change/goal pointers
+   - continue until `hiq-review` records current acceptance proof or a real blocker is recorded
+4. Do not record `hiq-review` as owner unless a review artifact or acceptance matrix is being produced or refreshed.
+5. Treat `review.eval_enabled` as capability only; record eval applicability and the actual run, or a reason that eval is not applicable.
+6. Ask the user only for genuine decisions that local truth cannot answer.
+7. If context pressure rises or a handoff is required, write a checkpoint first and mirror its path in session/current-change/goal state.
+8. Keep durable verification commands current; mark stale or unrunnable commands instead of preserving deleted paths.
 '@
 Write-IfAbsent (Join-Path $resolvedRoot "AGENTS.md") $agents
+
+$agentsPath = Join-Path $resolvedRoot 'AGENTS.md'
+$agentsExistingText = Get-Content -LiteralPath $agentsPath -Raw
+if (($agentsExistingText -notmatch '(?m)^# HiQ Project Rule' -or $agentsExistingText -notmatch 'hiq-auto') -and -not $currentPreexisted -and -not $sessionPreexisted) {
+  $currentPath = Join-Path $hiq 'current-change.json'
+  $currentText = Get-Content -LiteralPath $currentPath -Raw
+  $currentText = $currentText.Replace('"hostAutomationEvidence": "AGENTS.md"', '"hostAutomationEvidence": null')
+  [System.IO.File]::WriteAllText($currentPath, $currentText, [System.Text.UTF8Encoding]::new($false))
+  $sessionPath = Join-Path $hiq 'session.md'
+  $sessionText = Get-Content -LiteralPath $sessionPath -Raw
+  $sessionText = $sessionText.Replace('- **host_automation_evidence**: `AGENTS.md`', '- **host_automation_evidence**: none')
+  [System.IO.File]::WriteAllText($sessionPath, $sessionText, [System.Text.UTF8Encoding]::new($false))
+  Write-Output 'warning=existing AGENTS.md is not a HiQ rule; hostAutomationEvidence=none'
+}
 
 $gitignore = Join-Path $resolvedRoot ".gitignore"
 if (Test-Path -LiteralPath $gitignore) {

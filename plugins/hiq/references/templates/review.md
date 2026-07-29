@@ -1,8 +1,12 @@
 # Review — <title>
 
 - **change**: `.hiq/changes/<id>/`
-- **mode**: review | fix-loop | verify | demo | closeout | handoff
+- **change_id**: `<id>`
+- **content_revision**: 0
+- **reviewed_content_revision**: 0
+- **mode**: review | fix-loop | verify | demo | eval | closeout | handoff
 - **status**: open | blocked | partial | pass | fail
+- **verdict**: PENDING | PASS | PARTIAL | FAIL | BLOCKED
 - **updated**:
 
 ## 1. Review scope
@@ -16,25 +20,27 @@
 
 | id | acceptance item | proof source | status | notes |
 |----|-----------------|--------------|--------|-------|
-| A1 | | command / demo / file | pending \| pass \| fail | |
+| A1 | | command / demo / file | pending | |
 
 ## 3. Findings
 
 | severity | location | problem | fix hint | status |
 |----------|----------|---------|----------|--------|
-| Blocking | path:line | | | open \| fixed \| accepted-risk |
+| Blocking | path:line | | | open |
 
 ## 4. Evidence checks
 
 | check | why it matters | latest proof | status |
 |------|----------------|--------------|--------|
-| original acceptance path | | | pending \| pass \| fail |
+| original acceptance path | | | pending |
 
 ## 5. Eval / benchmark evidence
 
-- eval required?: yes | no
+- eval applicability: unknown | not-applicable | optional | required
+- eval status: not-run | running | pass | fail | blocked | not-applicable
 - config: `.hiq/eval/eval.yaml`
 - run/report:
+- reason when not applicable:
 - key metrics:
 - ingest into verdict?: yes | no
 
@@ -53,10 +59,11 @@
 
 ## 8. Verdict
 
-- verdict: PASS | PARTIAL | FAIL
+- verdict: PENDING | PASS | PARTIAL | FAIL | BLOCKED
+- reviewed content revision:
 - merge / release recommendation:
 - next route: hiq-review | hiq-implement | hiq-debug | hiq-grill | hiq-session
 
 ## 9. Closeout notes
 
-- 
+-

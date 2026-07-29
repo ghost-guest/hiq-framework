@@ -1,6 +1,10 @@
-schema: 1
+schema: 2
 name: hiq-framework-eval
 root: .
+capability:
+  enabled: true
+  meaning: available-not-required
+  applicability_source: .hiq/current-change.json
 artifacts:
   session: .hiq/session.md
   current_change: .hiq/current-change.json
@@ -32,4 +36,8 @@ metrics:
     track_tools: true
 outputs:
   report_root: .hiq/eval/runs
-  review_ingest: .hiq/changes/2026-07-26-comet-absorb/review.md
+  review_ingest: .hiq/changes/<id>/review.md
+notes:
+  - Eval availability does not make every change eval-required.
+  - Record eval applicability, status, run path, and reason in current-change state.
+  - Replace <id> with the active change before running a real evaluation wave.

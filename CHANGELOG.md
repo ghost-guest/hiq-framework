@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.24 — 2026-07-29
+
+- closes the HiQ runtime/state truth gap exposed by a real project session
+  - adds additive schema 2 fields for state revisions, owner leases, host automation capability, review proof, eval applicability, checkpoints, and verification status
+  - makes fresh init honest: `hostAutomationLevel=instruction-only` and `autoStatus=available`; `AGENTS.md` is no longer treated as hook proof
+  - upgrades POSIX and Windows `hiq-status` / `hiq-doctor` with pointer reconciliation, phase-to-owner checks, exact accepted-review proof, eval truth, checkpoint/path validation, and stale verify-command detection
+  - adds compatible informational doctor output plus `--strict` CI blocking mode
+  - adds cross-platform smoke fixtures for owner drift, accepted-without-proof, and deleted verification paths
+  - aligns auto/session/review/init/skill contracts and the framework templates/docs around the same state closure
+
 ## 0.8.23 — 2026-07-28
 
 - tightens HiQ goal fidelity after a real preset-data comparison session exposed MVP drift

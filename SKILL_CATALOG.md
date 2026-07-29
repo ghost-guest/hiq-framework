@@ -25,9 +25,10 @@ This file explains what each retained HiQ owner skill does, plus the optional `h
 
 **Capability | 能力**
 
-- Acts as the automatic outer wrapper for HiQ-managed project work.
+- Acts as the instruction-driven outer coordination wrapper for HiQ-managed project work.
 - Creates or refreshes a durable goal record under `.hiq/goals/`.
-- Repeatedly chooses the truthful current owner from the retained 11 and keeps going until acceptance is proven.
+- Repeatedly leases the truthful current owner from the retained 11 and keeps going until acceptance is proven.
+- `AGENTS.md` alone means `instruction-only`; stronger host automation requires verifiable evidence.
 - Routes back to `hiq-grill` when a goal still lacks approved spec, seam, or ticket-frontier truth.
 
 - 作为 HiQ 项目工作的自动外层 wrapper。

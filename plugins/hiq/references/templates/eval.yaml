@@ -1,6 +1,10 @@
-schema: 1
+schema: 2
 name: hiq-local-eval
 root: .
+capability:
+  enabled: true
+  meaning: available-not-required
+  applicability_source: .hiq/current-change.json
 artifacts:
   session: .hiq/session.md
   current_change: .hiq/current-change.json
@@ -34,4 +38,6 @@ outputs:
   report_root: .hiq/eval/runs
   review_ingest: .hiq/changes/<id>/review.md
 notes:
+  - Eval availability does not make every change eval-required.
+  - Record `evalApplicability`, `evalStatus`, `evalRunPath`, and `evalReason` in current-change state.
   - Replace `<id>` with the active change before running a real evaluation wave.

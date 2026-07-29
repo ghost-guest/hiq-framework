@@ -146,6 +146,26 @@ STATE rebuild_pointer:
     goalNow
     acceptanceTarget
     latestCheckpoint
+    checkpointRequired
+    checkpointReason
+    resumeSource
+    stateRevision
+    changeId
+    stateStatus
+    contentRevision
+    hostTarget
+    hostAutomationLevel
+    reviewStatus
+    reviewPath
+    reviewedContentRevision
+    evalApplicability
+    evalStatus
+    evalRunPath
+    evalReason
+    verifyCommandsSource
+    verifyCwd
+    verifyStatus
+    verifyWaiverReason
     updatedAt
   if a field is missing, derive it from active change docs before asking the user
 
@@ -173,8 +193,10 @@ STATE resume_probe:
     test whether these are all true:
       BOOTSTRAP/MEMORY/config/session/current-change exist
       active change path exists when referenced
-      checkpoint path exists when referenced
+      checkpoint path exists when referenced and is inside `context-checkpoints/`
+      session/current-change/goal pointers agree on owner, phase, revision, and checkpoint
       next owner skill is explicit
+      verify cwd/source/path references are runnable or explicitly waived
     if any item fails:
       mark the probe partial/failing and name the missing local state
 
@@ -296,7 +318,8 @@ Write a checkpoint before session switch when any of these are true:
 - another chat or agent will continue the work
 - the current change has non-trivial open loops that should not be reconstructed from memory
 
-The checkpoint must be linked from `.hiq/session.md` and mirrored into `.hiq/current-change.json`.
+The checkpoint must be linked from `.hiq/session.md`, `.hiq/current-change.json`, and the active goal when one exists.
+`checkpointRequired` and `checkpointReason` must explain why it exists.
 No checkpoint path, no safe handoff.
 
 ## Gates
@@ -306,6 +329,7 @@ No checkpoint path, no safe handoff.
 - Large logs/debug output go to files or checkpoints, not into `session.md`
 - Every high-context handoff must write a checkpoint path into local state
 - `hiq-session` does not replace the real owner skill; once the pointer is rebuilt, route onward
+- `hiq-session` must keep stateRevision, owner/phase, checkpoint, and verify fields aligned with current-change
 - Durable collaboration constraints must be written locally, not left implicit in chat
 - Status/probe output must stay compact and operational
 

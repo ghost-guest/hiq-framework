@@ -49,9 +49,10 @@ HiQ 是唯一开发框架。它把项目初始化、会话续作、立项计划�
 ### 3.1 可选自动包装层：`hiq-auto`
 
 - `hiq-auto` 不是 retained owner #12
-- 它是外层自动入口，负责 goal 驱动、连续选择当前真实 owner、持续推进到验收或诚实阻塞
-- 默认 owner 仍然只来自 retained 11
+- 它是外层协调入口，负责 goal 驱动、连续选择当前真实 owner、持续推进到验收或诚实阻塞
+- 默认 owner 仍然只来自 retained 11，并以 owner lease 记录当前真实动作
 - `hiq-review` 仍然是唯一 completion / acceptance proof owner
+- `AGENTS.md` 是 instruction contract，不是宿主 hook 证明；宿主能力必须由 `hostAutomationLevel` 与 evidence 记录
 
 ## 4. 风险分级
 
@@ -112,8 +113,10 @@ ELSE ASK one focused decision question
 - `BOOTSTRAP.md`：项目恢复入口
 - `MEMORY.md`：持久约束/经验
 - `config.yaml`：runtime / review / install 默认配置
-- `current-change.json`：机器可读的当前 change 指针
-- `session.md`：当前会话与下一步
+- `current-change.json`：机器可读的当前 change 指针、owner lease、review/eval/checkpoint/verify truth
+- `session.md`：当前会话与下一步，以及与 current-change 对齐的 state revision
+- `hiq-status`：紧凑运行快照与 pointer alignment
+- `hiq-doctor`：文件健康 + 语义闭环校验；`--strict` 用于 CI 阻断
 - `goals/<id>.md`：`hiq-auto` 的外层 goal 编排状态
 - `grill.md`：事实/决策/专家板/计划状态
 - `IMPLEMENT.md`：批准后的施工契约

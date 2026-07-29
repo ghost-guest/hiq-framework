@@ -102,13 +102,15 @@ Send this sentence directly to Codex / Claude / LiveAgent:
 
 ```text
 $hiq-auto
-# auto goal loop -> choose current owner -> keep going until acceptance
+# instruction-driven goal loop -> lease the truthful owner -> keep going until acceptance
 ```
 
 ```text
 $hiq-auto
-# 自动进入 goal 循环 -> 选择当前 owner -> 一直推进到验收达标
+# 规则驱动的 goal 循环 -> 租约式记录真实 owner -> 一直推进到验收达标
 ```
+
+`AGENTS.md` and `auto.enabled` request this coordination layer; they do not prove that a host hook executed. Fresh projects report `hostAutomationLevel=instruction-only` and `autoStatus=available` until a host provides verifiable stronger evidence. Inspect the truth with `hiq-status`, and use `hiq-doctor --strict` when CI or release checks must block on state drift.
 
 ## Typical Flow | 典型流程
 

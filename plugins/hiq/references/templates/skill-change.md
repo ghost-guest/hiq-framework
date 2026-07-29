@@ -1,7 +1,7 @@
 # Skill Change — <title>
 
 - **change**: `.hiq/changes/<id>/`
-- **mode**: upgrade | absorb | build | sync
+- **mode**: upgrade | absorb | compose | eval | bundle | publish | build | sync
 - **target_skill**: `hiq-...`
 - **status**: draft | approved | in-progress | done
 - **approved_by_user**: no | yes (message ref)

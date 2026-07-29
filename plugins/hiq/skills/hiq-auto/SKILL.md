@@ -5,6 +5,7 @@ description: >-
   在项目级规则触发或用户显式要求 auto / autopilot / goal / 端到端完成时，先进入 goal
   模式，持续在 retained 11 中选择当前真实 owner skill，直到 `hiq-review` 证明验收达标，
   或诚实记录阻塞与下一步。它不是第 12 个 retained owner；它是对 retained 11 的自动包装层。
+  宿主自动化能力必须单独记录：`AGENTS.md` 只能证明 instruction-only，不能证明 hook 或持久化执行。
 ---
 
 # hiq-auto — 自动入口 · Goal 编排 · 直到验收
@@ -60,7 +61,9 @@ STATE activate:
   write or refresh the auto-entry audit markers in `.hiq/session.md` and `.hiq/current-change.json`:
     entry skill = `hiq-auto`
     entry mode = auto | goal | continue | override | handoff
-    auto status = active unless explicitly disabled/blocked/accepted
+    host automation level = unavailable | instruction-only | turn-scoped | persistent
+    host evidence = a local rule or verifiable host artifact; `AGENTS.md` alone means instruction-only
+    auto status = available before this turn enters; active only after hiq-auto is actually loaded; disabled/blocked/accepted remain terminal states
     manual override = none unless the user explicitly forced one owner lane
   decide mode:
     explicit auto / new request -> auto or goal
@@ -119,8 +122,10 @@ STATE choose_owner:
     durable ADR/lesson/casebook/audit capture needed -> hiq-knowledge
     framework/skill governance change needed -> hiq-skill
     otherwise -> hiq
-  append owner transition row into the goal ledger
-  write owner + reason into goal record and session pointer
+  lease the owner for the current real action; do not keep a prior aspirational owner
+  append owner transition row into the goal ledger after the action completes
+  write owner + reason + lease action into goal record and session pointer
+  if owner is `hiq-review`, require that a review artifact or acceptance matrix is being produced or refreshed
   mirror the same audit markers into `.hiq/current-change.json`:
     autoOwnerSkill
     autoReason
@@ -133,7 +138,8 @@ STATE drive_step:
     `.hiq/session.md`
     `.hiq/current-change.json`
     `.hiq/goals/<id>.md`
-  refresh acceptance ledger and evidence ledger using the latest owner output
+  refresh stateRevision/contentRevision, owner transition, acceptance ledger, and evidence ledger using the latest owner output
+  if eval is enabled, also record eval applicability/status/run path or an explicit not-applicable reason
   ask:
     is the goal complete?
     are all acceptance items proven for this revision?
@@ -160,7 +166,8 @@ STATE complete:
 STATE handoff:
   if session/context must switch before acceptance:
     write checkpoint
-    store checkpoint path in session/current-change/goal record
+    set checkpointRequired=true and checkpointReason=handoff|compaction|context-pressure
+    store the same checkpoint path in session/current-change/goal record
     resume later through hiq-auto continue
 ```
 
@@ -191,6 +198,8 @@ Templates:
 - Do not let the outer goal drift after acceptance or non-goals changed; route back to planning truth first
 - Do not silently downgrade a requested outcome into MVP, prototype, first-version, or placeholder work without an explicit user decision
 - Do not route to `hiq-review` while real API data, workbooks, credentials, environments, or other user-owned acceptance inputs are still pending
+- Do not claim a host hook or stronger automation level unless the recorded evidence can be verified
+- Do not leave `ownerSkill` on `hiq-review` while the real action is implementation, debugging, or planning
 - Do not treat a user answer as a plan; after a user-owned decision, refresh `grill.md` / `IMPLEMENT.md` before coding
 
 ## Announce

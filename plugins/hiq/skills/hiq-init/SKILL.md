@@ -13,7 +13,8 @@ description: >-
 
 - Project baseline skeleton under `.hiq/`
 - Cross-agent resume packet and machine-readable current-change mirror
-- Runtime config and evaluation scaffold
+- Runtime config and evaluation scaffold with explicit applicability state
+- Schema 2 state pointers that distinguish host capability from HiQ policy
 - Portable CodeGraph install, init, index, and MCP wiring
 - Refreshing missing files in existing repos without clobbering user memory
 - Absorbing legacy runtimes into HiQ directory structure
@@ -100,8 +101,8 @@ STATE fill:
     MEMORY.md — durable notes, conventions, active work, lessons
     MAP.md — top-level modules / owners / entry points
     config.yaml — runtime defaults for resume/review/install
-    current-change.json — machine-readable pointer for status/resume
-    session.md — human-readable pointer and next step
+    current-change.json — machine-readable pointer for status/resume, owner lease, review/eval/checkpoint/verify truth
+    session.md — human-readable pointer and next step with the same state revision
     spec/index.md — verify/lint/test seed
     graph/modules.md and graph/edges.md — human-readable module navigation
     eval/eval.yaml — local evaluation scaffold that hiq-review can ingest later
@@ -202,6 +203,8 @@ STATE report:
 - Never use a managed-init route that can silently fall back to an untrusted PATH binary
 - Never write machine-absolute paths into committed MCP configs
 - Never call the repo initialized while runtime state or eval scaffold is still missing
+- Never seed `autoStatus=active` or imply host hooks when init can only prove instruction-only capability
+- Fresh init must emit schema 2 state fields in both session and current-change
 
 ## Done
 
